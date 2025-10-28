@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export const SlideTabsExample = () => {
     return (
-        <div className="bg-neutral-100 py-20">
+        <div className="py-20">
             <SlideTabs />
         </div>
     );
@@ -52,7 +52,7 @@ const Tab = ({ children, setPosition }) => {
                     opacity: 1,
                 });
             }}
-            className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-white mix-blend-difference md:px-5 md:py-3 md:text-base"
+            className="relative z-10 block cursor-pointer px-3 py-1.5  text-white mix-blend-difference md:px-5 md:py-3 md:text-base"
         >
             {children}
         </li>
