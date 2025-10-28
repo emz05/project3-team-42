@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Tabs from './Tabs';
 
 const OrderPanel = () => {
     const [employee, setEmployee] = useState(null);
@@ -29,8 +30,9 @@ const OrderPanel = () => {
             </header>
 
             <main>
-                <p>This is the order panel.</p>
                 <p>Role: {employee.role}</p>
+
+                <div className="tabs-container"><Tabs /></div>
             </main>
         </div>
     );

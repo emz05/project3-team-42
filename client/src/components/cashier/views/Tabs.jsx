@@ -26,11 +26,9 @@ const SlideTabs = () => {
             }}
             className="relative mx-auto flex w-fit rounded-full border-2 border-black bg-white p-1"
         >
-            <Tab setPosition={setPosition}>Home</Tab>
-            <Tab setPosition={setPosition}>Pricing</Tab>
-            <Tab setPosition={setPosition}>Features</Tab>
-            <Tab setPosition={setPosition}>Docs</Tab>
-            <Tab setPosition={setPosition}>Blog</Tab>
+            <Tab setPosition={setPosition}>Milk Tea</Tab>
+            <Tab setPosition={setPosition}>Fruit</Tab>
+            <Tab setPosition={setPosition}>Blended</Tab>
 
             <Cursor position={position} />
         </ul>
@@ -71,3 +69,5 @@ const Cursor = ({ position }) => {
         />
     );
 };
+
+export default SlideTabsExample;

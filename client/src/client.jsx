@@ -9,11 +9,13 @@ function Client() {
     return (
         <BrowserRouter>
             <Routes>
+                {/* set paths for cashier */}
                 <Route path='/cashier/login' element={<LoginPanel/>}/>
                 <Route path='/cashier/order' element={<OrderPanel/>}/>
-                <Route path='/home' element={<HomePanel/>}/>
 
-                {/*default page if error*/}
+
+                {/* set default page for landing and errors */}
+                <Route path='/home' element={<HomePanel/>}/>
                 <Route path="/" element={<Navigate to="/home" />} />
                 <Route path="*" element={<Navigate to="/home" />} />
             </Routes>
