@@ -1,0 +1,28 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPanel from './components/cashier/views/LoginPanel.jsx';
+import OrderPanel from './components/cashier/views/OrderPanel.jsx';
+import './components/cashier/css/client.css';
+
+function Client() {
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path='/login' element={<LoginPanel/>}/>
+                <Route path='/order' element={<OrderPanel/>}/>
+                {/*<Route path="/" element={<Navigate to="/home" />} />*/}
+                {/*<Route path="*" element={<Navigate to="/home" />} />*/}
+
+            </Routes>
+        </BrowserRouter>
+    );
+}
+
+
+
+
+
+
+export default Client;
+
+
