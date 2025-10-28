@@ -34,7 +34,7 @@ const LoginPanel = () => {
         try {
             const employee = await employeeAPI.login(employeeID);
             sessionStorage.setItem('employee', JSON.stringify(employee.data));
-            navigate('/order');
+            navigate('/cashier/order');
         } catch (error) {
             setErrorMessage('Invalid employee ID');
             setPassword('');
