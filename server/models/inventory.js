@@ -41,30 +41,26 @@ const Inventory = {
         await pool.query(query, [quantityOrdered, inventoryId]);
     },
 
-    // update inventory item's boolean if low in stock
-    markLowStockForDrink: async (drinkId) => {
-        const query =
+
+    updateLowStockStatus: async (drinkId, toppings, client = pool) => {
+        // update inventory item's (drink ingredients) boolean if low in stock
+        const drinkQuery =
             `UPDATE inventory
             SET lowstock = (curramount < $1)
             WHERE id IN (
-                SELECT inventory_id 
-                FROM drinkingredient 
-                WHERE drink_id = $2
+                SELECT inventory_id FROM drinkingredient WHERE drink_id = $2
             )`;
+        await client.query(drinkQuery, [LOW_STOCK_THRESHOLD, drinkId]);
 
-        await pool.query(query, [LOW_STOCK_THRESHOLD, drinkId]);
-    },
-
-    // update topping's boolean if low in stock
-    markLowStockForTopping: async (toppingName) => {
-        const inventoryId = await Inventory.getInventoryIdByName(toppingName);
-
-        if (!inventoryId) {
-            return;
+        // update topping boolean if low in stock
+        if (toppings && toppings.length > 0) {
+            const toppingQuery =
+                `UPDATE inventory
+                SET lowstock = (curramount < $1)
+                WHERE LOWER(item) = ANY($2::text[])`;
+            const toppingNames = toppings.map(t => t.trim().toLowerCase());
+            await client.query(toppingQuery, [LOW_STOCK_THRESHOLD, toppingNames]);
         }
-
-        const query = 'UPDATE inventory SET lowstock = (curramount < $1) WHERE id = $2';
-        await pool.query(query, [LOW_STOCK_THRESHOLD, inventoryId]);
     }
 };
 
