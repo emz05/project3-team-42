@@ -55,17 +55,26 @@ router.get('/drinks', async (req, res) => {
     }
 });
 
-router.get('/drinks/:category', async(res, rep) => {
+router.get('/drinks/:category', async(req, res) => {
     try{
         const { category } = req.params;
         const drinks = await Drink.getDrinksByCategory(category);
         const drinkObjects = drinks.map(drinkObj);
-        res.json(drinkObj);
+        res.json(drinkObjects);
     } catch (e){
         console.log('Get categorized drinks: ' + e);
         res.status(500).json({ error: 'Failed to fetch categorized drinks' });
     }
+});
 
+router.get('/next-order-num', async (req, res) => {
+    try{
+        const latestID = await Receipt.getlatestReceiptId();
+        res.json({ orderNumber: latestID + 1});
+    } catch (e){
+        console.log('Get order number: ' + e);
+        res.status(500).json({ error: 'Failed to fetch order num' });
+    }
 });
 
 module.exports = router;
