@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import currency from 'currency.js';
-import defaultImage from '../assets/react.svg';
+import '../css/order-panel.css';
 
 const CartCard = ({ item, onUpdate }) => {
-    const imageURL = drink.imagePath || defaultImage;
+    const imageURL = item.imagePath || '/vite.svg';
 
-    const formattedPrice = currency(item.price).format();
+    const formattedPrice = currency(item.totalPrice).format();
 
     const handleIncrease = () => {
         const updatedItem = {
@@ -89,3 +89,5 @@ const CartCard = ({ item, onUpdate }) => {
         </div>
     );
 };
+
+export default CartCard;

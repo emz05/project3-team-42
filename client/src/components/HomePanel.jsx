@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './home-panel.css';
 
 const HomePanel = () => {
     const navigate = useNavigate();

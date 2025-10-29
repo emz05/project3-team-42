@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPanel from './components/cashier/views/LoginPanel.jsx';
 import OrderPanel from './components/cashier/views/OrderPanel.jsx';
 import HomePanel from './components/HomePanel.jsx';
-import './components/cashier/css/client.css';
+// import './components/cashier/css/client.css';
 
 function Client() {
     return (

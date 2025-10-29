@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import currency from 'currency.js';
-import defaultImage from '../assets/react.svg';
+import '../css/order-panel.css';
 
 const DrinkCard = ({drink, onSelect}) => {
-    const imageURL = drink.imagePath || defaultImage;
-
+    const imageURL = drink.imagePath || '/vite.svg';
     const formattedPrice = currency(drink.price).format();
 
     const drinkSelection = () => {
@@ -13,10 +12,10 @@ const DrinkCard = ({drink, onSelect}) => {
 
     return(
 
-        <div className="drink-card"> onClick = { drinkSelection() }
-            <img src={imageURL} alt={drink.name} className="drink-image"/>
-            <h3 className="drink-name"> {drink.name} </h3>
-            <p className="drink-price"> {formattedPrice} </p>
+        <div className="drink-card" onClick = { drinkSelection }>
+            <img src={ imageURL } alt={ drink.name } className="drink-image"/>
+            <h3 className="drink-name"> { drink.name } </h3>
+            <p className="drink-price"> { formattedPrice } </p>
         </div>
     );
 };

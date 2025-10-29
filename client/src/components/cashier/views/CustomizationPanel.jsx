@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import '../css/order-panel.css';
 
 const CustomizationPanel = ({ drink, onClose, onAdd }) => {
     // default drink state
