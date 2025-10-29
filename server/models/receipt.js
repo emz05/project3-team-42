@@ -1,7 +1,7 @@
 const pool = require('../database');
 
 const Receipt = {
-    // creates a new receipt and return id of inserted row
+    // creates a new receipt and returns id of inserted row
     createReceipt: async (employeeId, totalAmount, paymentMethod) => {
         const now = new Date();
         const res = await pool.query(
