@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/employee');
-const Drinks = require('../models/drink');
+const Drinks = require('../models/drinks');
 const Receipt = require('../models/receipt');
-const Order = require('../models/order');
+const Order = require('../models/orders');
 const Inventory = require('../models/inventory');
 const pool = require('../database');
 
