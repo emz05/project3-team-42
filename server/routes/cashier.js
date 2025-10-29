@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/employee');
+const Drink = require('../models/drink');
+const Receipt = require('../models/receipt');
+const Order = require('../models/order');
+const Inventory = require('../models/inventory');
+const pool = require('../database');
+
 
 const drinkObj = (drink) => ({
     id: drink.id,
@@ -10,6 +16,14 @@ const drinkObj = (drink) => ({
     category: drink.category,
     isSeasonal: drink.is_seasonal
 });
+
+const validateRequest = (body) => {
+    const { employeeID, cartCards, total, paymentMethod } = body;
+
+    if (!employeeID || !cartCards || cartCards.length === 0 || !total || !paymentMethod) { return { valid: false, error: 'Missing parts to process order' } };
+
+    return { valid: true };
+};
 
 router.get('/test', (req, res) => {
     res.send('Howdy testing');
@@ -76,6 +90,32 @@ router.get('/next-order-num', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch order num' });
     }
 });
+
+const processOrder = async (item, receiptID, connection) => {
+    await Orders.addOrderItem(
+        receiptID,
+        item.drinkID,
+        item.quantity,
+        item.totalPrice,
+        item.iceLevel,
+        item.sweetness,
+        item.toppings.join(', '),
+        connection
+    );
+
+    await Inventory.updateDrinkIngredients(item.drinkID, item.quantity, connection);
+
+    if(item.toppings && item.toppings.length > 0){
+        for(const topping of item.toppings){
+            await Inventory.updateTopping(topping, item.quantity, connection);
+        }
+    }
+
+    await Inventory.updateLowStockStatus(item.drinkID, item.toppings, connection);
+};
+
+
+
 
 module.exports = router;
 
