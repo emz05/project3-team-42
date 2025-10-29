@@ -1,60 +1,71 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-export const SlideTabsExample = () => {
-    return (
-        <div className="bg-neutral-100 py-20">
-            <SlideTabs />
-        </div>
-    );
-};
-
-const SlideTabs = () => {
+const SlideTabs = ({ activeCategory, onCategoryChange }) => {
     const [position, setPosition] = useState({
         left: 0,
         width: 0,
         opacity: 0,
     });
 
+    const categories = ['Milk Tea', 'Fruit', 'Blended'];
+
+    const handleMouseLeave = () => {
+        setPosition({
+            left: position.left,
+            width: position.width,
+            opacity: 0,
+        });
+    };
+
     return (
         <ul
-            onMouseLeave={() => {
-                setPosition((pv) => ({
-                    ...pv,
-                    opacity: 0,
-                }));
-            }}
+            onMouseLeave={handleMouseLeave}
             className="relative mx-auto flex w-fit rounded-full border-2 border-black bg-white p-1"
         >
-            <Tab setPosition={setPosition}>Home</Tab>
-            <Tab setPosition={setPosition}>Pricing</Tab>
-            <Tab setPosition={setPosition}>Features</Tab>
-            <Tab setPosition={setPosition}>Docs</Tab>
-            <Tab setPosition={setPosition}>Blog</Tab>
+            {categories.map(category => (
+                <Tab
+                    key={category}
+                    setPosition={setPosition}
+                    isActive={activeCategory === category}
+                    onClick={() => onCategoryChange(category)}
+                >
+                    {category}
+                </Tab>
+            ))}
 
             <Cursor position={position} />
         </ul>
     );
 };
 
-const Tab = ({ children, setPosition }) => {
+const Tab = ({ children, setPosition, isActive, onClick }) => {
     const ref = useRef(null);
+
+    const handleMouseEnter = () => {
+        if (!ref?.current) return;
+
+        const { width } = ref.current.getBoundingClientRect();
+
+        setPosition({
+            left: ref.current.offsetLeft,
+            width: width,
+            opacity: 1,
+        });
+    };
+
+    // Add active class if this tab is selected
+    let tabClass = "relative z-10 block cursor-pointer px-3 py-1.5 text-white mix-blend-difference md:px-5 md:py-3 md:text-base";
+    if (isActive) {
+        tabClass = tabClass + " font-bold";
+    }
 
     return (
         <li
             ref={ref}
-            onMouseEnter={() => {
-                if (!ref?.current) return;
-
-                const { width } = ref.current.getBoundingClientRect();
-
-                setPosition({
-                    left: ref.current.offsetLeft,
-                    width,
-                    opacity: 1,
-                });
-            }}
-            className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-white mix-blend-difference md:px-5 md:py-3 md:text-base"
+            onMouseEnter={handleMouseEnter}
+            onClick={onClick}
+            className={tabClass}
         >
             {children}
         </li>
@@ -64,10 +75,10 @@ const Tab = ({ children, setPosition }) => {
 const Cursor = ({ position }) => {
     return (
         <motion.li
-            animate={{
-                ...position,
-            }}
+            animate={position}
             className="absolute z-0 h-7 rounded-full bg-black md:h-12"
         />
     );
 };
+
+export default SlideTabs;
