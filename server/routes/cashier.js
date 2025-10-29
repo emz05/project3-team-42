@@ -47,17 +47,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-/*router.get('/order', (req, res) => {
-    res.send('Order Page');
-});*/
-
-/*
-router.post('/order', (req, res) => {
-    const post = req.body
-
-    post.title
-})*/
-
 router.get('/drinks', async (req, res) => {
     try{
         const drinks = await Drink.getDrinks();
@@ -113,6 +102,7 @@ const processOrder = async (item, receiptID, connection) => {
 
     await Inventory.updateLowStockStatus(item.drinkID, item.toppings, connection);
 };
+
 
 
 
