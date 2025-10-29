@@ -55,6 +55,18 @@ router.get('/drinks', async (req, res) => {
     }
 });
 
+router.get('/drinks/:category', async(res, rep) => {
+    try{
+        const { category } = req.params;
+        const drinks = await Drink.getDrinksByCategory(category);
+        const drinkObjects = drinks.map(drinkObj);
+        res.json(drinkObj);
+    } catch (e){
+        console.log('Get categorized drinks: ' + e);
+        res.status(500).json({ error: 'Failed to fetch categorized drinks' });
+    }
+
+});
 
 module.exports = router;
 
