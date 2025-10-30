@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-src/.env.production
+src/.env.*
 !.env.example
+
 
