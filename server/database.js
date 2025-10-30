@@ -1,6 +1,6 @@
 // Establish Database Connection
 const { Pool } = require('pg');
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: './.env.development' });
 
 const pool = new Pool({
     user: process.env.PSQL_USER,
@@ -8,7 +8,7 @@ const pool = new Pool({
     database: process.env.PSQL_DATABASE,
     password: process.env.PSQL_PASSWORD,
     port: process.env.PSQL_PORT,
-    ssl: {rejectUnauthorized: false}
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 pool.connect()
