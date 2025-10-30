@@ -15,5 +15,16 @@ export const employeeAPI = {
     login: (password) => api.post('/cashier/login', { password }),
 };
 
+export const drinkAPI = {
+    getDrinks: () => api.get('/cashier/drinks'),
+    getDrinksByCategory: (category) => api.get(`/cashier/drinks/${category}`),
+};
 
-export default { employeeAPI };
+export const orderAPI = {
+    getNextOrderNum: () => api.get('/cashier/next-order-num'),
+    processOrder: (orderObjs) => api.post('/cashier/process-order', orderObjs),
+
+};
+
+
+export default { employeeAPI, drinkAPI, orderAPI };
