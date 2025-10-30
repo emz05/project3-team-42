@@ -1,0 +1,10 @@
+server/.env.*
+
+/node_modules
+
+/dist
+
+/build
+*.log
+
+.idea/
