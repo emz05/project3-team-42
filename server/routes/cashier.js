@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/employee');
-const Drinks = require('../models/drinks');
+const Drink = require('../models/drinks');
 const Receipt = require('../models/receipt');
-const Order = require('../models/orders');
+const Orders = require('../models/orders');
 const Inventory = require('../models/inventory');
 const pool = require('../database');
 
@@ -25,9 +25,11 @@ const validateRequest = (body) => {
     return { valid: true };
 };
 
-router.get('/test', (req, res) => {
-    res.send('Howdy testing');
+// test http://localhost:8080/api/cashier <- append other get paths to test backend
+router.get('/', (req, res) => {
+    res.json({ message: 'working Cashier API' });
 });
+
 
 // handles login requests from frontend, sends back employee data if password exists in DB
 router.post('/login', async (req, res) => {
@@ -58,6 +60,7 @@ router.get('/drinks', async (req, res) => {
     }
 });
 
+// http://localhost:8080/api/cashier/drinks/milk%20tea for milk tea category bc of space
 router.get('/drinks/:category', async(req, res) => {
     try{
         const { category } = req.params;

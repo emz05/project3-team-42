@@ -1,6 +1,6 @@
 // Establish Database Connection
 const { Pool } = require('pg');
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: './.env.development' });
 
 const pool = new Pool({
     user: process.env.PSQL_USER,

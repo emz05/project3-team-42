@@ -1,22 +1,28 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./database');
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
 
+const env = process.env.NODE_ENV || 'development';
+const envFileName = `.env.development.${env}`;
+
+require('dotenv').config({
+    path: path.resolve(__dirname, envFileName)
+});
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 
 // allow frontend requests access to backend
 const corsOptions = {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true
 };
 app.use(cors(corsOptions));
 
 app.use(express.json());
 
-// error middleware
+// logging calls middleware
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`);
     next();
@@ -38,7 +44,7 @@ process.on('SIGINT', async() => {
 });
 
 app.listen(port, () =>{
-    console.log(`Server running at http://localhost:${port}`)
+    console.log(`Server running in ${process.env.NODE_ENV} mode at http://localhost:${port}`);
 });
 
 module.exports = app;
