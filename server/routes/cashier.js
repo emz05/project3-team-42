@@ -18,9 +18,9 @@ const drinkObj = (drink) => ({
 });
 
 const validateRequest = (body) => {
-    const { employeeID, cartCards, total, paymentMethod } = body;
+    const { employeeID, cartCards, totalAmount, paymentMethod } = body;
 
-    if (!employeeID || !cartCards || cartCards.length === 0 || !total || !paymentMethod) { return { valid: false, error: 'Missing parts to process order' } };
+    if (!employeeID || !cartCards || cartCards.length === 0 || !totalAmount || !paymentMethod) { return { valid: false, error: 'Missing parts to process order' } };
 
     return { valid: true };
 };
@@ -45,7 +45,7 @@ router.post('/login', async (req, res) => {
         res.json({id: employee.id, firstName: employee.first_name, lastName: employee.last_name, role: employee.role });
     } catch (e){
         console.error('Post login: ', e);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: e.message });
     }
 });
 

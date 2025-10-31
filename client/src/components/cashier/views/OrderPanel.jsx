@@ -7,6 +7,7 @@ import CustomizationPanel from "./CustomizationPanel.jsx";
 import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import DrinkCard from "./DrinkCard.jsx";
 import CartCard from "./CartCard.jsx";
+import {drinkAPI, orderAPI} from "../../../services/api.js";
 
 
 const OrderPanel = () => {
@@ -25,17 +26,33 @@ const OrderPanel = () => {
 
     const navigate = useNavigate();
 
+    const fetchDrinks = async () => {
+        try{
+            const drinkObjs = await drinkAPI.getDrinks();
+            setDrinks(drinkObjs.data);
+        } catch(e){
+            console.error('Error fetching drinks: ', e);
+        }
+    };
+
+    const fetchOrderNumber = async () => {
+        try{
+            const nextReceiptID = await orderAPI.getNextOrderNum();
+            setOrderNumber(nextReceiptID.data.orderNumber);
+        } catch(e){
+            console.error('Error fetching order num: ', e);
+        }
+    }
+
     useEffect(() => {
         const loggedEmployee = sessionStorage.getItem('employee');
         if(loggedEmployee) { setEmployee(JSON.parse(loggedEmployee)) }
 
-        // TODO: Fetch drinks from API
-        setDrinks([
-            { id: 1, name: 'Classic Milk Tea', price: 5.50, category: 'Milk Tea', imagePath: '/drinks/milk-tea.png' },
-            { id: 2, name: 'Thai Tea', price: 6.00, category: 'Milk Tea', imagePath: '/drinks/thai-tea.png' },
-            { id: 3, name: 'Mango Green Tea', price: 5.75, category: 'Fruit', imagePath: '/drinks/mango-tea.png' },
-        ]);
-    }, []);
+        fetchDrinks();
+
+        fetchOrderNumber();
+
+    }, [navigate]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('employee');

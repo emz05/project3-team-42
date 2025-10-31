@@ -2,7 +2,7 @@ const pool = require('../database');
 
 const Receipt = {
     // creates a new receipt and returns id of inserted row
-    createReceipt: async (employeeId, totalAmount, paymentMethod) => {
+    createReceipt: async (employeeId, totalAmount, paymentMethod, connection = pool) => {
         const now = new Date();
         const res = await pool.query(
             `INSERT INTO receipt (employee_id, amount, payment_method, transaction_date, transaction_time) 
@@ -13,7 +13,7 @@ const Receipt = {
     },
 
     // returns last receipt id to store as current order number on client view
-    getlatestReceiptId: async () => {
+    getlatestReceiptId: async (connection = pool) => {
         const res = await pool.query('SELECT MAX(id) as latest_id FROM receipt');
         return res.rows[0].latest_id || 0;
     }
