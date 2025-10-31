@@ -1,14 +1,11 @@
+const dotenv = require('dotenv');
 const express = require('express');
+
+// load .env.development for locally runs, skip dotenv when Render runs
+if(process.env.NODE_ENV !== 'production'){ dotenv.config({path: '.env.development' }); }
+
 const cors = require('cors');
 const pool = require('./database');
-const path = require('path');
-
-const env = process.env.NODE_ENV || 'development';
-const envFileName = `.env.development.${env}`;
-
-require('dotenv').config({
-    path: path.resolve(__dirname, envFileName)
-});
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -38,8 +35,13 @@ app.use('/api/cashier', cashier);
 
 // Add process hook to shutdown pool
 process.on('SIGINT', async() => {
-    await pool.end();
-    console.log('Application successfully shutdown');
+    console.log('\nReceived SIGINT, shutting down gracefully...');
+    try {
+        await pool.end();
+        console.log('Database pool closed');
+    } catch (err) {
+        console.error('Error closing pool:', err);
+    }
     process.exit(0);
 });
 

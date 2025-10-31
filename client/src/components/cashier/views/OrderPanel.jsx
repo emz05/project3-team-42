@@ -7,7 +7,7 @@ import CustomizationPanel from "./CustomizationPanel.jsx";
 import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import DrinkCard from "./DrinkCard.jsx";
 import CartCard from "./CartCard.jsx";
-
+import {drinkAPI, orderAPI} from "../../../services/api.js";
 
 const OrderPanel = () => {
     const [employee, setEmployee] = useState(null);
@@ -25,17 +25,33 @@ const OrderPanel = () => {
 
     const navigate = useNavigate();
 
+    const fetchDrinks = async () => {
+        try{
+            const drinkObjs = await drinkAPI.getDrinks();
+            setDrinks(drinkObjs.data);
+        } catch(e){
+            console.error('Error fetching drinks: ', e);
+        }
+    };
+
+    const fetchOrderNumber = async () => {
+        try{
+            const nextReceiptID = await orderAPI.getNextOrderNum();
+            setOrderNumber(nextReceiptID.data.orderNumber);
+        } catch(e){
+            console.error('Error fetching order num: ', e);
+        }
+    }
+
     useEffect(() => {
         const loggedEmployee = sessionStorage.getItem('employee');
         if(loggedEmployee) { setEmployee(JSON.parse(loggedEmployee)) }
 
-        // TODO: Fetch drinks from API
-        setDrinks([
-            { id: 1, name: 'Classic Milk Tea', price: 5.50, category: 'Milk Tea', imagePath: '/drinks/milk-tea.png' },
-            { id: 2, name: 'Thai Tea', price: 6.00, category: 'Milk Tea', imagePath: '/drinks/thai-tea.png' },
-            { id: 3, name: 'Mango Green Tea', price: 5.75, category: 'Fruit', imagePath: '/drinks/mango-tea.png' },
-        ]);
-    }, []);
+        fetchDrinks();
+
+        fetchOrderNumber();
+
+    }, [navigate]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('employee');
@@ -129,7 +145,7 @@ const OrderPanel = () => {
     };
 
     // process payment and complete order
-    const processTransaction = () => {
+    const processTransaction = async () => {
         const cartIsEmpty = cartItems.length === 0;
         const noPaymentMethod = !paymentMethod;
 
@@ -143,14 +159,35 @@ const OrderPanel = () => {
             return;
         }
 
-        setFinalTotal(total);
-        // TODO: Send order to backend API
-        setShowPaymentConfirmation(true);
-        setOrderNumber(orderNumber + 1);
-        setCartItems([]);
-        setPointsInput('');
-        setAppliedPoints(0);
-        setPaymentMethod('');
+        try{
+            const orderData = {
+                employeeID: employee.id,
+                cartCards: cartItems.map(obj => ({
+                    drinkID: obj.drinkId,
+                    quantity: obj.quantity,
+                    totalPrice: obj.totalPrice,
+                    iceLevel: obj.iceLevel,
+                    sweetness: obj.sweetness,
+                    toppings: obj.toppings
+                })),
+                totalAmount: total,
+                paymentMethod: paymentMethod
+            };
+
+            const sendOrder = await orderAPI.processOrder(orderData);
+
+            if(sendOrder.data.success){
+                setFinalTotal(total);
+                setShowPaymentConfirmation(true);
+                setOrderNumber(orderNumber + 1);
+                setCartItems([]);
+                setPointsInput('');
+                setAppliedPoints(0);
+                setPaymentMethod('');
+            }
+        } catch(e){
+            console.error('Error processing order: ', e);
+        }
     };
 
     const formattedSubtotal = currency(subtotal).format();

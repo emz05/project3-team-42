@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 // axios instance for making API requests
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -15,5 +15,16 @@ export const employeeAPI = {
     login: (password) => api.post('/cashier/login', { password }),
 };
 
+export const drinkAPI = {
+    getDrinks: () => api.get('/cashier/drinks'),
+    getDrinksByCategory: (category) => api.get(`/cashier/drinks/${category}`),
+};
 
-export default { employeeAPI };
+export const orderAPI = {
+    getNextOrderNum: () => api.get('/cashier/next-order-num'),
+    processOrder: (orderObjs) => api.post('/cashier/process-order', orderObjs),
+
+};
+
+
+export default { employeeAPI, drinkAPI, orderAPI };
