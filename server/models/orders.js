@@ -2,7 +2,7 @@ const pool = require('../database');
 
 const Orders = {
     // creates a new order and returns id of inserted row
-    addOrderItem: async (receiptId, drinkId, quantity, orderPrice, iceCustomization, sweetnessCustomization, toppingsCustomization) => {
+    addOrderItem: async (receiptId, drinkId, quantity, orderPrice, iceCustomization, sweetnessCustomization, toppingsCustomization, connectino = pool) => {
         const res = await pool.query(
             `INSERT INTO orders (drink_id, receipt_id, quantity, order_price, ice_customization, sweetness_customization, toppings_customization)
              VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
