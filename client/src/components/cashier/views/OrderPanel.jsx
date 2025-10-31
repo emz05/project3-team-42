@@ -9,7 +9,6 @@ import DrinkCard from "./DrinkCard.jsx";
 import CartCard from "./CartCard.jsx";
 import {drinkAPI, orderAPI} from "../../../services/api.js";
 
-
 const OrderPanel = () => {
     const [employee, setEmployee] = useState(null);
     const [drinks, setDrinks] = useState([]);
@@ -146,7 +145,7 @@ const OrderPanel = () => {
     };
 
     // process payment and complete order
-    const processTransaction = () => {
+    const processTransaction = async () => {
         const cartIsEmpty = cartItems.length === 0;
         const noPaymentMethod = !paymentMethod;
 
@@ -160,14 +159,35 @@ const OrderPanel = () => {
             return;
         }
 
-        setFinalTotal(total);
-        // TODO: Send order to backend API
-        setShowPaymentConfirmation(true);
-        setOrderNumber(orderNumber + 1);
-        setCartItems([]);
-        setPointsInput('');
-        setAppliedPoints(0);
-        setPaymentMethod('');
+        try{
+            const orderData = {
+                employeeID: employee.id,
+                cartCards: cartItems.map(obj => ({
+                    drinkID: obj.drinkId,
+                    quantity: obj.quantity,
+                    totalPrice: obj.totalPrice,
+                    iceLevel: obj.iceLevel,
+                    sweetness: obj.sweetness,
+                    toppings: obj.toppings
+                })),
+                totalAmount: total,
+                paymentMethod: paymentMethod
+            };
+
+            const sendOrder = await orderAPI.processOrder(orderData);
+
+            if(sendOrder.data.success){
+                setFinalTotal(total);
+                setShowPaymentConfirmation(true);
+                setOrderNumber(orderNumber + 1);
+                setCartItems([]);
+                setPointsInput('');
+                setAppliedPoints(0);
+                setPaymentMethod('');
+            }
+        } catch(e){
+            console.error('Error processing order: ', e);
+        }
     };
 
     const formattedSubtotal = currency(subtotal).format();

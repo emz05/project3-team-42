@@ -4,10 +4,13 @@ const Receipt = {
     // creates a new receipt and returns id of inserted row
     createReceipt: async (employeeId, totalAmount, paymentMethod, connection = pool) => {
         const now = new Date();
+        const transactionDate = now.toISOString().slice(0, 10);
+        const transactionTime = now.toISOString().slice(11, 19);
+
         const res = await pool.query(
             `INSERT INTO receipt (employee_id, amount, payment_method, transaction_date, transaction_time) 
              VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-            [employeeId, totalAmount, paymentMethod, now, now]
+            [employeeId, totalAmount, paymentMethod, transactionDate, transactionTime]
         );
         return res.rows[0].id;
     },
