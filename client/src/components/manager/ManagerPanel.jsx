@@ -18,6 +18,9 @@ const ManagerPanel = () => {
   const [error, setError] = useState('');
   const [selected, setSelected] = useState(null); // current drink or null
   const [mode, setMode] = useState('view'); // 'view' | 'edit' | 'add'
+  const [weeklySales, setWeeklySales] = useState([]);
+  const [hourlySales, setHourlySales] = useState([]);
+  const [peakDay, setPeakDay] = useState(null);
 
   const categories = useMemo(() => Array.from(new Set(drinks.map(d => d.category))).sort(), [drinks]);
   const imagePaths = useMemo(() => Array.from(new Set(drinks.map(d => d.drink_image_path))).sort(), [drinks]);
@@ -38,6 +41,29 @@ const ManagerPanel = () => {
   useEffect(() => {
     if (activeTab === 'Menu Management') {
       refreshDrinks();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setLoading(true);
+        const [w, h, p] = await Promise.all([
+          managerAPI.weeklySales(),
+          managerAPI.hourlySales(),
+          managerAPI.peakDay(),
+        ]);
+        setWeeklySales(w.data || []);
+        setHourlySales(h.data || []);
+        setPeakDay(p.data || null);
+      } catch (e) {
+        setError('Failed to load dashboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (activeTab === 'Dashboard') {
+      loadDashboard();
     }
   }, [activeTab]);
 
@@ -69,9 +95,52 @@ const ManagerPanel = () => {
           <section>
             <h1>Dashboard</h1>
             <div className="grid">
-              <div className="card placeholder">Sales Overview (placeholder)</div>
-              <div className="card placeholder">Top Items (placeholder)</div>
-              <div className="card placeholder">Peak Hours (placeholder)</div>
+              <div className="card">
+                <div className="card-title">Weekly Orders</div>
+                {loading && <div className="muted">Loading…</div>}
+                {!loading && (
+                  <table className="data-table">
+                    <thead>
+                      <tr><th>Year</th><th>Week</th><th>Orders</th></tr>
+                    </thead>
+                    <tbody>
+                      {weeklySales.map((r, i) => (
+                        <tr key={i}><td>{r.year}</td><td>{r.week}</td><td>{r.total_orders}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <div className="card">
+                <div className="card-title">Hourly Sales</div>
+                {loading && <div className="muted">Loading…</div>}
+                {!loading && (
+                  <table className="data-table">
+                    <thead>
+                      <tr><th>Hour</th><th>Orders</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>
+                      {hourlySales.map((r, i) => (
+                        <tr key={i}><td>{r.hour_of_day}</td><td>{r.total_orders}</td><td>${Number(r.total_sales || 0).toFixed(2)}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <div className="card">
+                <div className="card-title">Peak Sales Day (Top 10 sum)</div>
+                {loading && <div className="muted">Loading…</div>}
+                {!loading && peakDay && (
+                  <div className="peak-day">
+                    <div className="peak-date">{peakDay.transaction_date}</div>
+                    <div className="peak-sum">${Number(peakDay.sum || 0).toFixed(2)}</div>
+                  </div>
+                )}
+                {!loading && !peakDay && <div className="muted">No data</div>}
+              </div>
+
               <div className="card placeholder">Inventory Alerts (placeholder)</div>
             </div>
           </section>

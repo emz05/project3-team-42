@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Drink = require('../models/drinks');
+const Receipt = require('../models/receipt');
 
 const deriveSeasonal = (category) => {
   if (!category) return false;
@@ -66,5 +67,35 @@ router.delete('/drinks/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+// Analytics endpoints
+router.get('/analytics/weekly-sales', async (req, res) => {
+  try {
+    const rows = await Receipt.getWeeklySalesHistory();
+    res.json(rows);
+  } catch (e) {
+    console.error('Manager analytics weekly-sales: ', e);
+    res.status(500).json({ error: 'Failed to fetch weekly sales' });
+  }
+});
 
+router.get('/analytics/hourly-sales', async (req, res) => {
+  try {
+    const rows = await Receipt.getHourlySalesHistory();
+    res.json(rows);
+  } catch (e) {
+    console.error('Manager analytics hourly-sales: ', e);
+    res.status(500).json({ error: 'Failed to fetch hourly sales' });
+  }
+});
+
+router.get('/analytics/peak-day', async (req, res) => {
+  try {
+    const row = await Receipt.getPeakSalesDay();
+    res.json(row);
+  } catch (e) {
+    console.error('Manager analytics peak-day: ', e);
+    res.status(500).json({ error: 'Failed to fetch peak day' });
+  }
+});
+
+module.exports = router;

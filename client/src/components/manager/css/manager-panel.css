@@ -25,6 +25,13 @@
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; }
 .placeholder { color: #6b7280; }
+.card-title { font-weight: 600; margin-bottom: 10px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th, .data-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
+.data-table th { color: #6b7280; font-weight: 600; }
+.peak-day { display: flex; align-items: baseline; gap: 10px; }
+.peak-date { color: #6b7280; }
+.peak-sum { color: var(--brand); font-weight: 700; font-size: 18px; }
 
 /* Manager Menu Management */
 .menu-action { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 8px 12px; cursor: pointer; }
