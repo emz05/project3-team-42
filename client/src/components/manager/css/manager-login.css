@@ -1,0 +1,9 @@
+/* Placeholder login styles */
+.manager-login-container { display: flex; align-items: center; justify-content: center; height: 100vh; background: #f7f7f8; }
+.manager-login-box { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px 28px; width: 340px; text-align: center; }
+.manager-login-box h1 { margin: 0 0 10px; font-size: 22px; color: #111827; }
+.manager-login-box p { margin: 0 0 18px; color: #6b7280; }
+.google-btn { display: inline-block; width: 100%; padding: 10px 12px; border-radius: 8px; background: #1f2937; color: #e5e7eb; text-decoration: none; cursor: pointer; }
+.google-btn.disabled { opacity: 0.55; cursor: not-allowed; }
+.note { margin-top: 10px; font-size: 12px; color: #9ca3af; }
+

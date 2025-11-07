@@ -1,8 +1,24 @@
 const dotenv = require('dotenv');
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 
-// load .env.development for locally runs, skip dotenv when Render runs
-if(process.env.NODE_ENV !== 'production'){ dotenv.config({path: '.env.development' }); }
+// Load appropriate .env before anything uses process.env
+(() => {
+  const env = process.env.NODE_ENV;
+  const envFile = env === 'production' ? '.env.production' : '.env.development';
+  const candidates = [
+    path.join(__dirname, envFile),      // server/.env.production | .env.development
+    path.join(__dirname, '.env'),       // server/.env
+    path.join(__dirname, '..', '.env'), // project root .env
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      dotenv.config({ path: p });
+      break;
+    }
+  }
+})();
 
 const cors = require('cors');
 const pool = require('./database');
@@ -12,8 +28,8 @@ const port = process.env.PORT || 8080;
 
 // allow frontend requests access to backend
 const corsOptions = {
-    origin: process.env.CLIENT_URL,
-    credentials: true
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    credentials: true,
 };
 app.use(cors(corsOptions));
 
@@ -31,6 +47,9 @@ app.use('/', entry);*/
 
 const cashier = require('./routes/cashier');
 app.use('/api/cashier', cashier);
+
+const manager = require('./routes/manager');
+app.use('/api/manager', manager);
 
 
 // Add process hook to shutdown pool
