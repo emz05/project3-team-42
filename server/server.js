@@ -32,6 +32,16 @@ app.use('/', entry);*/
 const cashier = require('./routes/cashier');
 app.use('/api/cashier', cashier);
 
+const inventoryRoutes = require('./routes/inventory');
+app.use('/api/inventory', inventoryRoutes);
+
+const orderRoutes = require('./routes/orders');
+app.use('/api/orders', orderRoutes);
+
+const employeeRoutes = require('./routes/employee');
+app.use('/api/employees', employeeRoutes);
+
+
 
 // Add process hook to shutdown pool
 if(process.env.NODE_ENV === 'production'){
@@ -46,6 +56,20 @@ if(process.env.NODE_ENV === 'production'){
         process.exit(0);
     });
 }
+
+app.get('/health', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT 1 as ok');
+    res.json({
+      status: 'ok',
+      db: rows[0].ok === 1,
+      env: process.env.NODE_ENV
+    });
+  } catch (e) {
+    res.status(500).json({ status: 'db_error', error: e.message });
+  }
+});
+
 
 app.listen(port, () =>{
     console.log(`Server running in ${process.env.NODE_ENV} mode at http://localhost:${port}`);
