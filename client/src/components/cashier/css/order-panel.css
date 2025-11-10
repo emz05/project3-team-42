@@ -366,6 +366,12 @@ ul {
     margin-right: 10px;
     transition: all 0.2s ease;
 }
+.points-input::-webkit-inner-spin-button,
+.points-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 
 .points-input:focus {
     outline: none;
