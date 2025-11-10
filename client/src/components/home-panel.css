@@ -1,8 +1,10 @@
 /* transferred default vite styling into this file */
-button {
-    border-radius: 8px;
+.cashier-button,
+.admin-button,
+.kiosk-button {
+    border-radius: 25px;
     border: 1px solid transparent;
-    padding: 0.6em 1.2em;
+    padding: 50px 300px;
     font-size: 1em;
     font-weight: 500;
     font-family: inherit;
@@ -10,17 +12,31 @@ button {
     cursor: pointer;
     transition: border-color 0.25s;
 }
-button:hover {
+.cashier-button:hover,
+.admin-button:hover,
+.kiosk-button:hover{
     border-color: #646cff;
 }
-button:focus,
-button:focus-visible {
+.cashier-button:focus,
+.cashier-button:focus-visible,
+.admin-button:focus,
+.admin-button:focus-visible,
+.kiosk-button:focus,
+.kiosk-button:focus-visible{
     outline: 4px auto -webkit-focus-ring-color;
-}
 
+}
 
 body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    margin-top: 350px;
 }
