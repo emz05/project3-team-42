@@ -12,4 +12,42 @@ const Employee = {
     }
 }
 
-module.exports = Employee;
+// list all employees (for manager view)
+async function listEmployees(connection = pool) {
+  const { rows } = await connection.query(
+    'SELECT id, first_name, last_name, role FROM Employee ORDER BY id ASC'
+  );
+  return rows;
+}
+
+// create a new employee (manager view)
+async function createEmployee(
+  { first_name, last_name, role, password, phone_number },
+  connection = pool
+) {
+  if (!first_name || !last_name || !role || !password || !phone_number) {
+    throw new Error('MISSING_FIELDS');
+  }
+
+  const { rows } = await connection.query(
+    `INSERT INTO Employee (first_name, last_name, role, password, phone_number)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, first_name, last_name, role, phone_number`,
+    [
+      first_name.trim(),
+      last_name.trim(),
+      role.trim(),
+      password.trim(),
+      phone_number.trim()
+    ]
+  );
+  return rows[0];
+}
+
+
+
+module.exports = {
+  ...Employee,
+  listEmployees,
+  createEmployee,   
+};
