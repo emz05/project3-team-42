@@ -11,8 +11,12 @@ const pool = new Pool({
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-pool.connect()
-    .then(() => console.log('Connected to database'))
-    .catch((err) => console.error('Database connection error: ', err));
+pool.on('connect', () => {
+    console.log('Connected to database');
+});
+
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+});
 
 module.exports = pool;

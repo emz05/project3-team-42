@@ -5,10 +5,11 @@ const LOW_STOCK_THRESHOLD = 20;
 const Inventory = {
     // queries DB for inventory item matching given name
     // returns first matching inventory item id
-    getInventoryIdByName: async (itemName, connection = pool) => {
+    getInventoryIdByName: async (itemName, client = null) => {
+        const db = client || pool;
         // case insensitive
         const query = 'SELECT id FROM inventory WHERE LOWER(item) = LOWER($1)';
-        const result = await connection.query(query, [itemName.trim()]);
+        const result = await db.query(query, [itemName.trim()]);
 
         if (result.rows.length === 0) {
             return null;
@@ -18,19 +19,21 @@ const Inventory = {
     },
 
     // update all inventory items listed in drink recipe of listed drink id by quantity
-    updateDrinkIngredients: async (drinkId, quantityOrdered, connection = pool) => {
+    updateDrinkIngredients: async (drinkId, quantityOrdered, client = null) => {
+        const db = client || pool;
         const query =
             `UPDATE inventory
             SET curramount = curramount - (di.quantity_used * $1)
             FROM drinkingredient di
             WHERE di.drink_id = $2 AND di.inventory_id = inventory.id`;
 
-        await connection.query(query, [quantityOrdered, drinkId]);
+        await db.query(query, [quantityOrdered, drinkId]);
     },
 
     // update inventory for used toppings by quantity
-    updateTopping: async (toppingName, quantityOrdered, connection = pool) => {
-        const inventoryID = await Inventory.getInventoryIdByName(toppingName, connection);
+    updateTopping: async (toppingName, quantityOrdered, client = null) => {
+        const db = client || pool;
+        const inventoryID = await Inventory.getInventoryIdByName(toppingName, client);
 
         if (!inventoryID) {
             console.warn(`Topping "${toppingName}" not found in inventory`);
@@ -38,11 +41,12 @@ const Inventory = {
         }
 
         const query = 'UPDATE inventory SET curramount = curramount - $1 WHERE id = $2';
-        await connection.query(query, [quantityOrdered, inventoryID]);
+        await db.query(query, [quantityOrdered, inventoryID]);
     },
 
 
-    updateLowStockStatus: async (drinkId, toppings, connection = pool) => {
+    updateLowStockStatus: async (drinkId, toppings, client = null) => {
+        const db = client || pool;
         // update inventory item's (drink ingredients) boolean if low in stock
         const drinkQuery =
             `UPDATE inventory
@@ -50,7 +54,7 @@ const Inventory = {
             WHERE id IN (
                 SELECT inventory_id FROM drinkingredient WHERE drink_id = $2
             )`;
-        await connection.query(drinkQuery, [LOW_STOCK_THRESHOLD, drinkId]);
+        await db.query(drinkQuery, [LOW_STOCK_THRESHOLD, drinkId]);
 
         // update topping boolean if low in stock
         if (toppings && toppings.length > 0) {
@@ -59,14 +63,15 @@ const Inventory = {
                 SET lowstock = (curramount < $1)
                 WHERE LOWER(item) = ANY($2::text[])`;
             const toppingNames = toppings.map(t => t.trim().toLowerCase());
-            await connection.query(toppingQuery, [LOW_STOCK_THRESHOLD, toppingNames]);
+            await db.query(toppingQuery, [LOW_STOCK_THRESHOLD, toppingNames]);
         }
     }
 };
 
 // List inventory items, optionally only those low in stock
-async function list({ lowStock = false, page = 1, limit = 20 }, connection = pool) {
-  const offset = (page - 1) * limit;
+async function list({ lowStock = false, page = 1, limit = 20 }, client = null) {
+  const db = client || pool;
+  const offset = (page - 1) * limit
 
   const baseSelect = `
     SELECT id, item, curramount, lowstock
@@ -79,21 +84,22 @@ async function list({ lowStock = false, page = 1, limit = 20 }, connection = poo
 
   const query = [baseSelect, whereClause, orderClause, paging].join(' ').trim();
 
-  const { rows } = await connection.query(query, [limit, offset]);
+  const { rows } = await db.query(query, [limit, offset]);
   return rows;
 }
 
 // Create a new inventory item
-async function createItem({ item, curramount = 0 }, connection = pool) {
+async function createItem({ item, curramount = 0 }, client = null) {
   if (!item || typeof item !== 'string') {
     throw new Error('ITEM_REQUIRED');
   }
   const qty = Number(curramount) || 0;
+  const db = client || pool;
 
   // lowstock is derived from the threshold constant you already use
   const low = qty < LOW_STOCK_THRESHOLD;
 
-  const { rows } = await connection.query(
+  const { rows } = await db.query(
     `INSERT INTO inventory (item, curramount, lowstock)
      VALUES ($1, $2, $3)
      RETURNING id, item, curramount, lowstock`,
@@ -103,14 +109,15 @@ async function createItem({ item, curramount = 0 }, connection = pool) {
 }
 
 // Update an inventory item (e.g., name or quantity)
-async function updateItem(id, fields = {}, connection = pool) {
+async function updateItem(id, fields = {}, client = null) {
   const updates = {};
+  const db = client || pool;
   if (typeof fields.item === 'string') updates.item = fields.item.trim();
   if (fields.curramount !== undefined) updates.curramount = Number(fields.curramount);
 
   // nothing to update
   if (Object.keys(updates).length === 0) {
-    const { rows } = await connection.query(
+    const { rows } = await db.query(
       `SELECT id, item, curramount, lowstock FROM inventory WHERE id = $1`,
       [id]
     );
@@ -127,7 +134,7 @@ async function updateItem(id, fields = {}, connection = pool) {
   const vals = Object.values(updates);
   const set = cols.map((c, i) => `${c} = $${i + 1}`).join(', ');
 
-  const { rows } = await connection.query(
+  const { rows } = await db.query(
     `UPDATE inventory SET ${set}
      WHERE id = $${cols.length + 1}
      RETURNING id, item, curramount, lowstock`,
