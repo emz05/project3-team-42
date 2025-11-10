@@ -64,4 +64,82 @@ const Inventory = {
     }
 };
 
-module.exports = Inventory;
+// List inventory items, optionally only those low in stock
+async function list({ lowStock = false, page = 1, limit = 20 }, connection = pool) {
+  const offset = (page - 1) * limit;
+
+  const baseSelect = `
+    SELECT id, item, curramount, lowstock
+    FROM inventory
+  `;
+
+  const whereClause = lowStock ? `WHERE lowstock = true` : ``;
+  const orderClause = `ORDER BY item ASC`;
+  const paging = `LIMIT $1 OFFSET $2`;
+
+  const query = [baseSelect, whereClause, orderClause, paging].join(' ').trim();
+
+  const { rows } = await connection.query(query, [limit, offset]);
+  return rows;
+}
+
+// Create a new inventory item
+async function createItem({ item, curramount = 0 }, connection = pool) {
+  if (!item || typeof item !== 'string') {
+    throw new Error('ITEM_REQUIRED');
+  }
+  const qty = Number(curramount) || 0;
+
+  // lowstock is derived from the threshold constant you already use
+  const low = qty < LOW_STOCK_THRESHOLD;
+
+  const { rows } = await connection.query(
+    `INSERT INTO inventory (item, curramount, lowstock)
+     VALUES ($1, $2, $3)
+     RETURNING id, item, curramount, lowstock`,
+    [item.trim(), qty, low]
+  );
+  return rows[0];
+}
+
+// Update an inventory item (e.g., name or quantity)
+async function updateItem(id, fields = {}, connection = pool) {
+  const updates = {};
+  if (typeof fields.item === 'string') updates.item = fields.item.trim();
+  if (fields.curramount !== undefined) updates.curramount = Number(fields.curramount);
+
+  // nothing to update
+  if (Object.keys(updates).length === 0) {
+    const { rows } = await connection.query(
+      `SELECT id, item, curramount, lowstock FROM inventory WHERE id = $1`,
+      [id]
+    );
+    return rows[0] || null;
+  }
+
+  // recompute lowstock if quantity provided (else keep existing)
+  if (updates.curramount !== undefined) {
+    updates.lowstock = updates.curramount < LOW_STOCK_THRESHOLD;
+  }
+
+  // dynamic SET clause
+  const cols = Object.keys(updates);
+  const vals = Object.values(updates);
+  const set = cols.map((c, i) => `${c} = $${i + 1}`).join(', ');
+
+  const { rows } = await connection.query(
+    `UPDATE inventory SET ${set}
+     WHERE id = $${cols.length + 1}
+     RETURNING id, item, curramount, lowstock`,
+    [...vals, id]
+  );
+  return rows[0] || null;
+}
+
+
+module.exports = {
+  ...Inventory,
+  list,
+  createItem,
+  updateItem,
+};
