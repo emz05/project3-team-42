@@ -34,16 +34,18 @@ app.use('/api/cashier', cashier);
 
 
 // Add process hook to shutdown pool
-process.on('SIGINT', async() => {
-    console.log('\nReceived SIGINT, shutting down gracefully...');
-    try {
-        await pool.end();
-        console.log('Database pool closed');
-    } catch (err) {
-        console.error('Error closing pool:', err);
-    }
-    process.exit(0);
-});
+if(process.env.NODE_ENV === 'production'){
+    process.on('SIGINT', async() => {
+        console.log('\nReceived SIGINT, shutting down gracefully...');
+        try {
+            await pool.end();
+            console.log('Database pool closed');
+        } catch (err) {
+            console.error('Error closing pool:', err);
+        }
+        process.exit(0);
+    });
+}
 
 app.listen(port, () =>{
     console.log(`Server running in ${process.env.NODE_ENV} mode at http://localhost:${port}`);
