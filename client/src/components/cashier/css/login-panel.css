@@ -6,7 +6,8 @@
 }
 
 .login-box {
-    width: 400px;
+    width: 600px;
+    height: 625px;
     padding: 40px;
     background-color: white;
     border-radius: 15px;
@@ -14,33 +15,87 @@
     text-align: center;
 }
 
+.login-title{
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.login-header {
+    margin-bottom: 20px;
+}
 
 .number-pad {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(3, 80px);
     gap: 10px;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 50px;
+    height: 325px;
 }
 
 .num-btn, .delete-btn {
-    font-size: 1.5rem;
-    padding: 15px;
-    border-radius: 10px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: 600;
     border: none;
-    background-color: #f0f0f0;
     cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.error-message {
+    color: #ef4444;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 15px 0;
+    position: relative;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
 }
 
 .num-btn:hover,
 .delete-btn:hover {
-    background-color: #ddd;
+    background-color: #e5e7eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.num-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.delete-btn {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+.delete-btn:active {
+    transform: translateY(0);
+    background-color: #b91c1c;
+}
+.num-btn:focus,
+.delete-btn:focus {
+    outline: none;
 }
 
 .dots-container {
     display: flex;
     justify-content: center;
-    margin: 10px 0;
+    margin-top: 50px;
     gap: 5px;
 }
 
@@ -50,8 +105,13 @@
     border: 1px solid black;
     border-radius: 50%;
     background-color: transparent;
+    transition: all 0.3s ease;
 }
 
 .dot.filled {
     background-color: black;
+    transform: scale(1.2);
 }
+
+
+
