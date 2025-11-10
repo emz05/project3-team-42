@@ -109,7 +109,7 @@ const processOrder = async (item, receiptID, connection) => {
 router.post('/process-order', async (req, res) => {
     const connection = await pool.connect();
 
-    // remove auto commit to allow undos if error occurs
+    // remove auto commit to allow undo if error occurs
     try{
         await connection.query('BEGIN');
 
@@ -122,7 +122,7 @@ router.post('/process-order', async (req, res) => {
         const { employeeID, cartCards, totalAmount, paymentMethod } = req.body;
 
         // updates Receipt table
-        const receiptID = await Receipt.createReceipt(employeeID, totalAmount, paymentMethod);
+        const receiptID = await Receipt.createReceipt(employeeID, totalAmount, paymentMethod, connection);
 
         // updates Orders table
         for(const card of cartCards){ await processOrder(card, receiptID, connection) };

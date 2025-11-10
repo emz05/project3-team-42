@@ -32,8 +32,8 @@ app.use('/', entry);*/
 const cashier = require('./routes/cashier');
 app.use('/api/cashier', cashier);
 
-const inventoryRoutes = require('./routes/inventory');   
-app.use('/api/inventory', inventoryRoutes);              
+const inventoryRoutes = require('./routes/inventory');
+app.use('/api/inventory', inventoryRoutes);
 
 const orderRoutes = require('./routes/orders');
 app.use('/api/orders', orderRoutes);
@@ -44,16 +44,18 @@ app.use('/api/employees', employeeRoutes);
 
 
 // Add process hook to shutdown pool
-process.on('SIGINT', async() => {
-    console.log('\nReceived SIGINT, shutting down gracefully...');
-    try {
-        await pool.end();
-        console.log('Database pool closed');
-    } catch (err) {
-        console.error('Error closing pool:', err);
-    }
-    process.exit(0);
-});
+if(process.env.NODE_ENV === 'production'){
+    process.on('SIGINT', async() => {
+        console.log('\nReceived SIGINT, shutting down gracefully...');
+        try {
+            await pool.end();
+            console.log('Database pool closed');
+        } catch (err) {
+            console.error('Error closing pool:', err);
+        }
+        process.exit(0);
+    });
+}
 
 app.get('/health', async (req, res) => {
   try {
