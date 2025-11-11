@@ -24,6 +24,52 @@ const Receipt = {
         const db = client || pool;
         const res = await db.query('SELECT MAX(id) as latest_id FROM receipt');
         return res.rows[0].latest_id || 0;
+    },
+
+    // Special Query #1: Weekly Sales History
+    getWeeklySalesHistory: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT EXTRACT(week FROM transaction_date) AS week,
+                    EXTRACT(isoyear FROM transaction_date) AS year,
+                    COUNT(*) AS total_orders
+             FROM receipt
+             GROUP BY week, year
+             ORDER BY year, week`
+        );
+        return res.rows;
+    },
+
+    // Special Query #2: Realistic Sales History (by hour)
+    getHourlySalesHistory: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT TO_CHAR(transaction_time, 'HH12:00 AM') AS hour_of_day,
+                    COUNT(*) AS total_orders,
+                    SUM(amount) AS total_sales
+             FROM receipt
+             GROUP BY TO_CHAR(transaction_time, 'HH12:00 AM')
+             ORDER BY hour_of_day`
+        );
+        return res.rows;
+    },
+
+    // Special Query #3: Peak Sales Day (sum of top 10 orders per day)
+    getPeakSalesDay: async (connection = pool) => {
+        const res = await connection.query(
+            `WITH Top10 AS (
+                SELECT transaction_date,
+                       amount,
+                       ROW_NUMBER() OVER (PARTITION BY transaction_date ORDER BY amount DESC) AS rnk
+                FROM receipt
+            )
+            SELECT transaction_date,
+                   SUM(amount) AS sum
+            FROM Top10
+            WHERE rnk <= 10
+            GROUP BY transaction_date
+            ORDER BY sum DESC
+            LIMIT 1`
+        );
+        return res.rows[0] || null;
     }
 };
 
