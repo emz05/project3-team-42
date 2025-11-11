@@ -5,7 +5,7 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
     const [currentDate] = useState(new Date());
 
     useEffect(() => {
-        const timer = setTimeout(onClose, 3000);
+        const timer = setTimeout(onClose, 10000);
         return () => clearTimeout(timer);
     }, [onClose]);
 

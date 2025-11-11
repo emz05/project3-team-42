@@ -8,13 +8,13 @@ const HomePanel = () => {
     return(
         <div className="button-container">
             <div className="admin-button">
-                <button onClick={() => navigate('/admin/login')}>Admin</button>
+                <button onClick={() => navigate('/admin/login')} style={{fontSize: '1.5em', fontWeight: 'bold'}}>Admin</button>
             </div>
             <div className="cashier-button">
-                <button onClick={() => navigate('/cashier/login')}>Cashier</button>
+                <button onClick={() => navigate('/cashier/login')} style={{fontSize: '1.5em', fontWeight: 'bold'}}>Cashier</button>
             </div>
             <div className="kiosk-button">
-                <button onClick={() => navigate('/kiosk')}>Kiosk</button>
+                <button onClick={() => navigate('/kiosk')} style={{fontSize: '1.5em', fontWeight: 'bold'}}>Kiosk</button>
             </div>
         </div>
     );

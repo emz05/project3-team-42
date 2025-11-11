@@ -3,7 +3,7 @@ import currency from 'currency.js';
 import '../css/order-panel.css';
 
 const CartCard = ({ item, onUpdate }) => {
-    const imageURL = item.imagePath || '/vite.svg';
+    const imageURL = `/${item.imagePath || 'vite.svg'}`;
 
     const formattedPrice = currency(item.totalPrice).format();
 
