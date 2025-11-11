@@ -10,6 +10,8 @@ import CustomizePage from './components/kiosk/views/CustomizePage.jsx';
 import ReviewPage from './components/kiosk/views/ReviewPage.jsx';
 import ConfirmationPage from './components/kiosk/views/ConfirmationPage.jsx';
 
+import ManagerLogin from './components/manager/ManagerLogin.jsx';
+import ManagerPanel from './components/manager/ManagerPanel.jsx';
 // import './components/cashier/css/client.css';
 
 function Client() {
@@ -30,6 +32,17 @@ function Client() {
 
                 {/* default home and error pages */}
                 <Route path='/home' element={<HomePanel />} />
+                <Route path='/cashier/login' element={<LoginPanel/>}/>
+                <Route path='/cashier/order' element={<OrderPanel/>}/>
+
+                {/* manager placeholder login + panel */}
+                <Route path='/manager/login' element={<ManagerLogin/>} />
+                {/* keep existing Admin link working as alias */}
+                <Route path='/admin/login' element={<ManagerLogin/>} />
+                <Route path='/manager' element={<ManagerPanel/>} />
+
+                {/* set default page for landing and errors */}
+                <Route path='/home' element={<HomePanel/>}/>
                 <Route path="/" element={<Navigate to="/home" />} />
                 <Route path="*" element={<Navigate to="/home" />} />
             </Routes>
@@ -38,3 +51,4 @@ function Client() {
 }
 
 export default Client;
+
