@@ -1,0 +1,22 @@
+/* IGNORE  .kiosk-container {
+    text-align: center;
+    width: 340px;
+    margin: auto;
+}
+
+.kiosk-button {
+    width: 100%;
+    padding: 10px 12px; 
+    font-size: 1em;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background-color: #f3f1f1;
+    cursor: pointer;
+    transition: border-color 0.25s, background-color 0.25s;
+    text-align: center;
+}
+
+.kiosk-button:hover {
+    border-color: #646cff;
+} */
