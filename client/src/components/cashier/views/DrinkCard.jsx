@@ -3,7 +3,7 @@ import currency from 'currency.js';
 import '../css/order-panel.css';
 
 const DrinkCard = ({drink, onSelect}) => {
-    const imageURL = drink.imagePath || '/vite.svg';
+    const imageURL = `/${drink.imagePath || 'vite.svg'}`;
     const formattedPrice = currency(drink.price).format();
 
     const drinkSelection = () => {
