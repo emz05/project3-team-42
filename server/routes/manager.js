@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Drink = require('../models/drinks');
 const Receipt = require('../models/receipt');
+const Inventory = require('../models/inventory');
+const Employee = require('../models/employee');
 
 const deriveSeasonal = (category) => {
   if (!category) return false;
@@ -95,6 +97,62 @@ router.get('/analytics/peak-day', async (req, res) => {
   } catch (e) {
     console.error('Manager analytics peak-day: ', e);
     res.status(500).json({ error: 'Failed to fetch peak day' });
+  }
+});
+
+router.get('/analytics/dashboard', async (req, res) => {
+  try {
+    const [
+      weeklySales,
+      hourlySales,
+      peakDay,
+      employeeList,
+      revenuePerEmployee,
+      ordersPerEmployee,
+      lowStockInventory,
+      drinkCounts,
+      ordersPerCategory,
+      salesPerDrink,
+      cheapDrinks,
+      highestReceipt,
+      xReport,
+      zReport,
+    ] = await Promise.all([
+      Receipt.getWeeklySalesHistory(),
+      Receipt.getHourlySalesHistory(),
+      Receipt.getPeakSalesDay(),
+      Employee.listEmployees(),
+      Receipt.getRevenuePerEmployee(),
+      Receipt.getOrdersPerEmployee(),
+      Inventory.getLowStockReport(),
+      Drink.getDrinkCountPerCategory(),
+      Drink.getOrdersPerCategory(),
+      Drink.getSalesPerDrink(),
+      Drink.getDrinksCheaperThan(5),
+      Receipt.getHighestReceiptAmount(),
+      Receipt.getXReport(),
+      Receipt.getZReport(),
+    ]);
+
+    res.json({
+      weeklySales,
+      hourlySales,
+      peakDay,
+      employees: employeeList,
+      revenuePerEmployee,
+      ordersPerEmployee,
+      lowStockInventory,
+      drinkCounts,
+      ordersPerCategory,
+      salesPerDrink,
+      cheapDrinks,
+      highestReceipt,
+      xReport,
+      zReport,
+    });
+  } catch (e) {
+    console.error('Manager analytics dashboard: ', e);
+    res.status(500).json({ error: 'Failed to fetch dashboard data' });
   }
 });
 
