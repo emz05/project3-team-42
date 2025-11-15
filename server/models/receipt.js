@@ -1,5 +1,41 @@
 const pool = require('../database');
 
+const buildDailyReport = async (date, connection = pool) => {
+    if (!date) {
+        return null;
+    }
+
+    const summaryQuery = `
+        SELECT $1::date AS report_date,
+               COUNT(*) AS total_orders,
+               COALESCE(SUM(amount), 0) AS total_sales,
+               ROUND(COALESCE(AVG(amount), 0), 2) AS avg_order_value,
+               MIN(transaction_time) AS first_transaction_time,
+               MAX(transaction_time) AS last_transaction_time
+        FROM receipt
+        WHERE transaction_date = $1::date
+    `;
+    const paymentsQuery = `
+        SELECT payment_method,
+               COUNT(*) AS total_orders,
+               COALESCE(SUM(amount), 0) AS total_sales
+        FROM receipt
+        WHERE transaction_date = $1::date
+        GROUP BY payment_method
+        ORDER BY total_sales DESC
+    `;
+    const [summaryRes, paymentsRes] = await Promise.all([
+        connection.query(summaryQuery, [date]),
+        connection.query(paymentsQuery, [date]),
+    ]);
+
+    const summary = summaryRes.rows[0] || {};
+    return {
+        ...summary,
+        payment_breakdown: paymentsRes.rows,
+    };
+};
+
 const Receipt = {
     // creates a new receipt and returns id of inserted row
     createReceipt: async (employeeId, totalAmount, paymentMethod, client = null) => {
@@ -70,7 +106,71 @@ const Receipt = {
             LIMIT 1`
         );
         return res.rows[0] || null;
-    }
+    },
+
+    // Revenue per employee (query #6)
+    getRevenuePerEmployee: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT e.id AS employee_id,
+                    e.first_name,
+                    e.last_name,
+                    COALESCE(SUM(r.amount), 0) AS total_revenue
+             FROM employee e
+             LEFT JOIN receipt r ON r.employee_id = e.id
+             GROUP BY e.id, e.first_name, e.last_name
+             ORDER BY total_revenue DESC, e.last_name ASC`
+        );
+        return res.rows;
+    },
+
+    // Orders per employee (query #9)
+    getOrdersPerEmployee: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT e.id AS employee_id,
+                    e.first_name,
+                    e.last_name,
+                    COUNT(r.id) AS total_orders,
+                    COALESCE(SUM(r.amount), 0) AS total_revenue,
+                    ROUND(COALESCE(AVG(r.amount), 0), 2) AS avg_order_value
+             FROM employee e
+             LEFT JOIN receipt r ON r.employee_id = e.id
+             GROUP BY e.id, e.first_name, e.last_name
+             ORDER BY total_revenue DESC, e.last_name ASC`
+        );
+        return res.rows;
+    },
+
+    // Highest single receipt amount (query #12)
+    getHighestReceiptAmount: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT id,
+                    amount AS max_receipt,
+                    employee_id,
+                    transaction_date,
+                    transaction_time
+             FROM receipt
+             ORDER BY amount DESC
+             LIMIT 1`
+        );
+        return res.rows[0] || null;
+    },
+
+    // Helper to generate standard X/Z POS summaries
+    getDailyReport: (date, connection = pool) => buildDailyReport(date, connection),
+
+    getXReport: async (connection = pool) => {
+        const today = new Date().toISOString().slice(0, 10);
+        return buildDailyReport(today, connection);
+    },
+
+    getZReport: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT MAX(transaction_date) AS latest_date FROM receipt`
+        );
+        const latest = res.rows[0]?.latest_date;
+        if (!latest) return null;
+        return buildDailyReport(latest, connection);
+    },
 };
 
 module.exports = Receipt;

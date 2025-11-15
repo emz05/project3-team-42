@@ -35,9 +35,73 @@ const Drink = {
     },
 
     deleteDrink: async (id) => {
-        await pool.query('DELETE FROM Drink WHERE id = $1', [id]);
-        return { success: true };
-    }
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+            await client.query('DELETE FROM orders WHERE drink_id = $1', [id]);
+            await client.query('DELETE FROM Drink WHERE id = $1', [id]);
+            await client.query('COMMIT');
+            return { success: true };
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    },
+
+    // Drink count per category (query #5)
+    getDrinkCountPerCategory: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT category,
+                    COUNT(*) AS drink_count
+             FROM Drink
+             GROUP BY category
+             ORDER BY category`
+        );
+        return res.rows;
+    },
+
+    // Orders per drink category (query #7)
+    getOrdersPerCategory: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT d.category,
+                    COALESCE(SUM(o.quantity), 0) AS total_orders
+             FROM orders o
+             JOIN Drink d ON o.drink_id = d.id
+             GROUP BY d.category
+             ORDER BY total_orders DESC`
+        );
+        return res.rows;
+    },
+
+    // Sales per individual drink (query #8)
+    getSalesPerDrink: async (connection = pool) => {
+        const res = await connection.query(
+            `SELECT d.drink_name,
+                    COALESCE(SUM(o.quantity), 0) AS total_orders,
+                    COALESCE(SUM(o.order_price * o.quantity), 0) AS total_revenue
+             FROM orders o
+             JOIN Drink d ON o.drink_id = d.id
+             GROUP BY d.drink_name
+             ORDER BY total_revenue DESC`
+        );
+        return res.rows;
+    },
+
+    // Drinks cheaper than given price (query #11)
+    getDrinksCheaperThan: async (price, connection = pool) => {
+        const target = Number(price) || 5;
+        const res = await connection.query(
+            `SELECT drink_name,
+                    drink_price AS price
+             FROM Drink
+             WHERE drink_price < $1
+             ORDER BY drink_price ASC`,
+            [target]
+        );
+        return res.rows;
+    },
 };
 
 module.exports = Drink;

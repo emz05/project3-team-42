@@ -34,6 +34,7 @@ export const managerAPI = {
     addDrink: (payload) => api.post('/manager/drinks', payload),
     updateDrink: (id, payload) => api.put(`/manager/drinks/${id}`, payload),
     deleteDrink: (id) => api.delete(`/manager/drinks/${id}`),
+    dashboard: () => api.get('/manager/analytics/dashboard'),
     weeklySales: () => api.get('/manager/analytics/weekly-sales'),
     hourlySales: () => api.get('/manager/analytics/hourly-sales'),
     peakDay: () => api.get('/manager/analytics/peak-day'),

@@ -143,10 +143,40 @@ async function updateItem(id, fields = {}, client = null) {
   return rows[0] || null;
 }
 
+async function getLowStockReport(connection = pool) {
+  const db = connection || pool;
+  const { rows: columnRows } = await db.query(
+    `SELECT LOWER(column_name) AS column_name
+     FROM information_schema.columns
+     WHERE table_name = 'inventory'`
+  );
+  const columns = new Set(columnRows.map((r) => r.column_name));
+  const selectCols = ['item', 'curramount'];
+  if (columns.has('restockamount')) selectCols.push('restockamount');
+  if (columns.has('unitcost')) selectCols.push('unitcost');
+  if (columns.has('vendor')) selectCols.push('vendor');
+
+  const query = `
+    SELECT ${selectCols.join(', ')}
+    FROM inventory
+    WHERE curramount < $1
+    ORDER BY curramount ASC
+  `;
+  const { rows } = await db.query(query, [LOW_STOCK_THRESHOLD]);
+  return rows.map((row) => ({
+    item: row.item,
+    curramount: row.curramount,
+    restockamount: Object.prototype.hasOwnProperty.call(row, 'restockamount') ? row.restockamount : null,
+    unitcost: Object.prototype.hasOwnProperty.call(row, 'unitcost') ? row.unitcost : null,
+    vendor: Object.prototype.hasOwnProperty.call(row, 'vendor') ? row.vendor : null,
+  }));
+}
+
 
 module.exports = {
   ...Inventory,
   list,
   createItem,
   updateItem,
+  getLowStockReport,
 };
