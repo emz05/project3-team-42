@@ -1,8 +1,18 @@
 const dotenv = require('dotenv');
 const express = require('express');
+const path = require('path');
 
-// load .env.development for locally runs, skip dotenv when Render runs
-if(process.env.NODE_ENV !== 'production'){ dotenv.config({path: '.env.development' }); }
+// Load env files with absolute paths so running from repo root works.
+if (process.env.NODE_ENV !== 'production') {
+    const devEnvPath = path.join(__dirname, '.env.development');
+    dotenv.config({ path: devEnvPath });
+} else {
+    // In production, try loading server/.env.production only if variables aren’t already provided
+    if (!process.env.PSQL_HOST) {
+        const prodEnvPath = path.join(__dirname, '.env.production');
+        dotenv.config({ path: prodEnvPath });
+    }
+}
 
 const cors = require('cors');
 const pool = require('./database');
