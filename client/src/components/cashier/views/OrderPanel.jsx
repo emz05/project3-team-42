@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import currency from 'currency.js';
-import '../css/order-panel.css'
 import SlideTabs from "./Tabs";
-import CustomizationPanel from "./CustomizationPanel.jsx";
-import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import DrinkCard from "./DrinkCard.jsx";
 import CartCard from "./CartCard.jsx";
+import CustomizationPanel from "./CustomizationPanel.jsx";
+import PaymentConfirmation from "./PaymentConfirmation.jsx";
+import { useTranslation } from '../../../context/translation-storage.jsx';
+import LanguageDropdown from "../../common/LanguageDropdown.jsx";
+import TranslatedText from "../../common/TranslateText.jsx";
 import {drinkAPI, orderAPI} from "../../../services/api.js";
+import '../css/order-panel.css'
 
 const OrderPanel = () => {
     const [employee, setEmployee] = useState(null);
@@ -24,6 +27,7 @@ const OrderPanel = () => {
 
 
     const navigate = useNavigate();
+    const { translate } = useTranslation();
 
     const fetchDrinks = async () => {
         try{
@@ -129,19 +133,19 @@ const OrderPanel = () => {
 
 
     // apply points discount
-    const applyPoints = () => {
+    const applyPoints = async() => {
         const points = parseFloat(pointsInput);
         const isValidPoints = !isNaN(points) && points > 0;
 
         if (!isValidPoints) {
-            alert('Please enter a valid points amount');
+            alert(await translate('Please enter a valid points amount'));
             return;
         }
         const discountLimit = subtotal + tax;
         const appliedDiscount = Math.min(points, discountLimit);
         setAppliedPoints(appliedDiscount);
         const discount = currency(points).format();
-        alert('Applied ' + discount + ' discount');
+        alert(await translate(`Applied ${discount} discount`));
     };
 
     // process payment and complete order
@@ -150,12 +154,12 @@ const OrderPanel = () => {
         const noPaymentMethod = !paymentMethod;
 
         if (cartIsEmpty) {
-            alert('Cart is empty');
+            alert(await translate('Cart is empty'));
             return;
         }
 
         if (noPaymentMethod) {
-            alert('Please select a payment method');
+            alert(await translate('Please select a payment method'));
             return;
         }
 
@@ -197,9 +201,10 @@ const OrderPanel = () => {
     return (
         <div className="order-panel">
             <header className="order-header">
-                <h1 className="header-title">Cashier View</h1>
+                <div className="order-language-dropdown"> <LanguageDropdown/></div>
+                <h1 className="header-title"> <TranslatedText text={'Cashier View'} /></h1>
                 <button className="logout-btn" onClick={handleLogout}>
-                    Logout
+                    <TranslatedText text={'Logout'} />
                 </button>
             </header>
 
@@ -223,7 +228,7 @@ const OrderPanel = () => {
 
                 <div className="cart-section">
                     <div className="cart-header">
-                        <p className="employee-name">{employee.firstName} {employee.lastName}</p>
+                        <p className="employee-name"><TranslatedText text={`${employee.firstName} ${employee.lastName}`} /></p>
                         <p className="order-number">#{orderNumber}</p>
                     </div>
 
@@ -239,17 +244,17 @@ const OrderPanel = () => {
 
                     <div className="cart-summary">
                         <div className="summary-row">
-                            <span>SUBTOTAL</span>
+                            <span> <TranslatedText text={'SUBTOTAL'} /></span>
                             <span>{formattedSubtotal}</span>
                         </div>
 
                         <div className="summary-row">
-                            <span>TAX</span>
+                            <span> <TranslatedText text={'TAX'} /></span>
                             <span>{formattedTax}</span>
                         </div>
 
                         <div className="summary-row">
-                            <span>POINTS</span>
+                            <span> <TranslatedText text={'POINTS'} /></span>
                             <input
                                 type="number"
                                 id="points"
@@ -259,12 +264,12 @@ const OrderPanel = () => {
                                 placeholder="0"
                             />
                             <button className="apply-points-btn" onClick={applyPoints}>
-                                Apply
+                                <TranslatedText text={'APPLY'} />
                             </button>
                         </div>
 
                         <div className="summary-row total-row">
-                            <span>TOTAL</span>
+                            <span> <TranslatedText text={'TOTAL'} /></span>
                             <span>{formattedTotal}</span>
                         </div>
 
@@ -273,13 +278,13 @@ const OrderPanel = () => {
                                 className={`payment-btn ${paymentMethod === 'Card' && 'selected'}`}
                                 onClick={() => setPaymentMethod('Card')}
                             >
-                                Card
+                                <TranslatedText text={'Card'} />
                             </button>
                             <button
                                 className={`payment-btn ${paymentMethod === 'Cash' && 'selected'}`}
                                 onClick={() => setPaymentMethod('Cash')}
                             >
-                                Cash
+                                <TranslatedText text={'Cash'} />
                             </button>
                         </div>
 
@@ -288,7 +293,7 @@ const OrderPanel = () => {
                             onClick={processTransaction}
                             disabled={cartItems.length === 0 || !paymentMethod}
                         >
-                            Charge Customer
+                            <TranslatedText text={'Charge Customer'} />
                         </button>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TranslatedText from "../../common/TranslateText.jsx";
 import '../css/order-panel.css';
 
 const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
@@ -18,31 +19,31 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
                         <path d="M30 50 L45 65 L70 35" stroke="white" strokeWidth="6" fill="none" />
                     </svg>
                 </div>
-                <h2 className="payment-title">Payment Successful!</h2>
+                <h2 className="payment-title"><TranslatedText text="Payment Successful!" /></h2>
 
                 <div className="payment-details">
-                    <h3 className="details-title">Transaction Details</h3>
+                    <h3 className="details-title"><TranslatedText text="Transaction Details" /></h3>
 
                     <div className="detail-row">
-                        <span className="detail-label">Order ID:</span>
+                        <span className="detail-label"><TranslatedText text="Order ID:" /></span>
                         <span className="detail-value">#{orderNumber}</span>
                     </div>
                     <div className="detail-divider" />
 
                     <div className="detail-row">
-                        <span className="detail-label">Date:</span>
+                        <span className="detail-label"><TranslatedText text="Date:" /></span>
                         <span className="detail-value">{currentDate.toLocaleDateString()}</span>
                     </div>
                     <div className="detail-divider" />
 
                     <div className="detail-row">
-                        <span className="detail-label">Time:</span>
+                        <span className="detail-label"><TranslatedText text="Time:" /></span>
                         <span className="detail-value">{currentDate.toLocaleTimeString()}</span>
                     </div>
                     <div className="detail-divider" />
 
                     <div className="detail-row">
-                        <span className="detail-label">Total:</span>
+                        <span className="detail-label"><TranslatedText text="Total:" /></span>
                         <span className="detail-value">${total.toFixed(2)}</span>
                     </div>
                 </div>

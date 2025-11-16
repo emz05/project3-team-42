@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import TranslatedText from "../../common/TranslateText.jsx";
 
 const SlideTabs = ({ activeCategory, onCategoryChange }) => {
     const [position, setPosition] = useState({
@@ -30,7 +31,7 @@ const SlideTabs = ({ activeCategory, onCategoryChange }) => {
                     isActive={activeCategory === category}
                     onClick={() => onCategoryChange(category)}
                 >
-                    {category}
+                    <TranslatedText text={category}/>
                 </Tab>
             ))}
 

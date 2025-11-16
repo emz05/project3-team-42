@@ -1,5 +1,6 @@
 import React from 'react';
 import currency from 'currency.js';
+import TranslatedText from "../../common/TranslateText.jsx";
 import '../css/order-panel.css';
 
 const CartCard = ({ item, onUpdate }) => {
@@ -58,7 +59,7 @@ const CartCard = ({ item, onUpdate }) => {
             />
 
             <div className="cart-card-details">
-                <h4 className="cart-card-name">{item.drinkName}</h4>
+                <h4 className="cart-card-name"> <TranslatedText text={item.drinkName}/></h4>
 
                 {customizationText && (
                     <p className="cart-card-customizations">

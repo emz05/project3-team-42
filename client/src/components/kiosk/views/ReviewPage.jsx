@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 
 export default function ReviewPage() {
   const navigate = useNavigate();
@@ -7,6 +8,7 @@ export default function ReviewPage() {
 
   return (
     <div className="kiosk-container">
+        <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
       <h2>Review Your Order</h2>
 
       <div className="kiosk-summary">

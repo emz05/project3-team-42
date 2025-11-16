@@ -1,9 +1,6 @@
 import axios from 'axios';
 
-// In dev, use Vite proxy by default (relative '/api'). In prod, use VITE_API_URL if provided.
-const API_BASE_URL = import.meta.env.DEV
-  ? '/api'
-  : (import.meta.env.VITE_API_URL || '/api');
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 // axios instance for making API requests
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -40,4 +37,9 @@ export const managerAPI = {
     peakDay: () => api.get('/manager/analytics/peak-day'),
 };
 
-export default { employeeAPI, drinkAPI, orderAPI, managerAPI };
+export const translationAPI = {
+    translate: (text, targetLanguage) =>
+        api.post('/translate', { text, targetLanguage}),
+};
+
+export default { employeeAPI, drinkAPI, orderAPI, managerAPI, translationAPI };

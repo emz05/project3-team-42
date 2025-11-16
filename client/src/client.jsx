@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { TranslationWrapper} from "./context/translation-storage.jsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import LoginPanel from './components/cashier/views/LoginPanel.jsx';
 import OrderPanel from './components/cashier/views/OrderPanel.jsx';
@@ -32,49 +33,58 @@ function Client() {
   }
 
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <ManagerAuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* set paths for cashier */}
-            <Route path="/cashier/login" element={<LoginPanel />} />
-            <Route path="/cashier/order" element={<OrderPanel />} />
+      <TranslationWrapper>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <ManagerAuthProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* set paths for cashier */}
+                <Route path="/cashier/login" element={<LoginPanel />} />
+                <Route path="/cashier/order" element={<OrderPanel />} />
 
-            {/* kiosk */}
-            <Route path="/kiosk" element={<KioskHomePage />} />
-            <Route path="/kiosk/categories" element={<CategoryPage />} />
-            <Route path="/kiosk/categories/:categoryId" element={<ItemPage />} />
-            <Route path="/kiosk/item/:itemId/customize" element={<CustomizePage />} />
-            <Route path="/kiosk/review" element={<ReviewPage />} />
-            <Route path="/kiosk/confirmation" element={<ConfirmationPage />} />
+                {/* kiosk */}
+                <Route path="/kiosk" element={<KioskHomePage />} />
+                <Route path="/kiosk/categories" element={<CategoryPage />} />
+                <Route path="/kiosk/categories/:categoryId" element={<ItemPage />} />
+                <Route path="/kiosk/item/:itemId/customize" element={<CustomizePage />} />
+                <Route path="/kiosk/review" element={<ReviewPage />} />
+                <Route path="/kiosk/confirmation" element={<ConfirmationPage />} />
 
-            {/* default home and error pages */}
-            <Route path="/home" element={<HomePanel />} />
-            <Route path="/cashier/login" element={<LoginPanel />} />
-            <Route path="/cashier/order" element={<OrderPanel />} />
+                {/* default home and error pages */}
+                <Route path="/home" element={<HomePanel />} />
+                <Route path="/cashier/login" element={<LoginPanel />} />
+                <Route path="/cashier/order" element={<OrderPanel />} />
 
-            {/* manager login + panel */}
-            <Route path="/manager/login" element={<ManagerLogin />} />
-            {/* keep existing Admin link working as alias */}
-            <Route path="/admin/login" element={<ManagerLogin />} />
-            <Route
-              path="/manager"
-              element={(
-                <ManagerProtectedRoute>
-                  <ManagerPanel />
-                </ManagerProtectedRoute>
-              )}
-            />
+                {/* manager login + panel */}
+                <Route path="/manager/login" element={<ManagerLogin />} />
+                {/* keep existing Admin link working as alias */}
+                <Route path="/admin/login" element={<ManagerLogin />} />
+                <Route
+                  path="/manager"
+                  element={(
+                    <ManagerProtectedRoute>
+                      <ManagerPanel />
+                    </ManagerProtectedRoute>
+                  )}
+                />
 
-            {/* set default page for landing and errors */}
-            <Route path="/home" element={<HomePanel />} />
-            <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="*" element={<Navigate to="/home" />} />
-          </Routes>
-        </BrowserRouter>
-      </ManagerAuthProvider>
-    </GoogleOAuthProvider>
+                {/* set default page for landing and errors */}
+                <Route path="/home" element={<HomePanel />} />
+                <Route path="/" element={<Navigate to="/home" />} />
+                <Route path="*" element={<Navigate to="/home" />} />
+              </Routes>
+            </BrowserRouter>
+          </ManagerAuthProvider>
+        </GoogleOAuthProvider>
+      </TranslationWrapper>
   );
 }
 
+
+
+
+
+
 export default Client;
+
+
