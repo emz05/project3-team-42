@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './css/manager-panel.css';
 import { managerAPI } from '../../services/api.js';
+import LanguageDropdown from "../common/LanguageDropdown.jsx";
 
 const LOW_STOCK_THRESHOLD = 20;
 const getTodayKey = () => new Date().toISOString().slice(0, 10);
@@ -511,7 +512,9 @@ const ManagerPanel = () => {
             </button>
           ))}
         </nav>
+          <div className="manager-language-dropdown"><LanguageDropdown /></div>
       </aside>
+
 
       <main className="content">
         {activeTab === 'Dashboard' && (

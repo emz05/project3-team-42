@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 
 export default function ItemsPage() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function ItemsPage() {
 
   return (
     <div className="kiosk-container">
+        <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
       <h2>Select a Drink</h2>
 
       <div className="kiosk-grid">

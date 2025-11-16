@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { employeeAPI } from '../../../services/api.js';
 import '../css/login-panel.css';
+import TranslatedText from "../../common/TranslateText.jsx";
 
 
 const LoginPanel = () => {
@@ -59,12 +60,12 @@ const LoginPanel = () => {
             <div className="login-box">
                 <div className="login-header">
                     <div> ♔ </div>
-                    <div className="login-title">Enter your employee ID</div>
+                    <div className="login-title"><TranslatedText text={"Enter your employee ID"}/></div>
                 </div>
 
                 <div className="dots-container"> {createPasswordDots()} </div>
 
-                {error && <div className="error-message"> {error} </div>}
+                {error && <div className="error-message">  <TranslatedText text={error} /> </div>}
 
                 <div className="number-pad">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
