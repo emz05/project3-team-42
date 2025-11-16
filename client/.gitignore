@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 src/.env.*
+.env
 !.env.example
 
 
