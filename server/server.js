@@ -57,6 +57,10 @@ app.use('/api/manager', manager);
 const translation = require('./routes/translation');
 app.use('/api/translate', translation);
 
+const paymentRoutes = require('./routes/payments');
+app.use('/api/payments', paymentRoutes);
+
+
 // Add process hook to shutdown pool
 if(process.env.NODE_ENV === 'production'){
     process.on('SIGINT', async() => {
