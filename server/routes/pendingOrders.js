@@ -20,20 +20,17 @@ router.post('/', async (req, res) => {
         await client.query('BEGIN');
 
         const normalizedCart = cartCards.map((item) => {
-            const cartItem = {
+            const unitPrice = typeof item.unitPrice === 'number' ? item.unitPrice : item.totalPrice;
+            const quantity = item.quantity || 1;
+
+            return {
                 drinkID: item.drinkId,
-                quantity: item.quantity,
-                totalPrice: item.totalPrice,
+                quantity,
+                totalPrice: unitPrice * quantity,
                 iceLevel: item.iceLevel,
                 sweetness: item.sweetness,
-                toppings: [],
+                toppings: Array.isArray(item.toppings) ? item.toppings : [],
             };
-
-            if (Array.isArray(item.toppings)) {
-                cartItem.toppings = item.toppings;
-            }
-
-            return cartItem;
         });
 
         const pending = await insertPendingOrder(client, {orderId, employeeId, cart: normalizedCart, totalAmount,});
