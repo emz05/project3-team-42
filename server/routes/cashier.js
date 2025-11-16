@@ -4,7 +4,7 @@ const Employee = require('../models/employee');
 const Drink = require('../models/drinks');
 const Receipt = require('../models/receipt');
 const pool = require('../database');
-const { fulfillCartItem } = require('../orderFulfillment');
+const { fulfillCartItem } = require('../models/orderFulfillment');
 
 
 const drinkObj = (drink) => ({

@@ -1,7 +1,12 @@
-const Orders = require('./models/orders');
-const Inventory = require('./models/inventory');
+const Orders = require('./orders');
+const Inventory = require('./inventory');
 
+// process single cart item -> adds to order table -> updates inventory
+// checks low stock status
 async function fulfillCartItem(item, receiptId, connection) {
+    let toppingsValue = item.toppings;
+    if (Array.isArray(item.toppings)) { toppingsValue = item.toppings.join(', '); }
+
     await Orders.addOrderItem(
         receiptId,
         item.drinkID,
@@ -9,7 +14,7 @@ async function fulfillCartItem(item, receiptId, connection) {
         item.totalPrice,
         item.iceLevel,
         item.sweetness,
-        Array.isArray(item.toppings) ? item.toppings.join(', ') : item.toppings,
+        toppingsValue,
         connection
     );
 

@@ -1,12 +1,13 @@
 const Stripe = require('stripe');
 const pool = require('../database');
 const Receipt = require('../models/receipt');
-const { fulfillCartItem } = require('../orderFulfillment');
+const { fulfillCartItem } = require('../models/orderFulfillment');
 const PendingOrders = require('../models/pendingOrders');
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+// verify stripe webhook, process successful payments
 const webhookHandler = async (req, res) => {
     const signature = req.headers['stripe-signature'];
     let event;
@@ -34,6 +35,7 @@ const webhookHandler = async (req, res) => {
     res.json({ received: true });
 };
 
+// once pending order status switches to paid
 async function finalizePendingOrder(paymentIntent) {
     const metadata = paymentIntent.metadata || {};
     const pendingOrderId = metadata.pendingOrderId;
@@ -41,22 +43,16 @@ async function finalizePendingOrder(paymentIntent) {
 
     let pendingOrder = null;
 
-    if (pendingOrderId) {
-        pendingOrder = await PendingOrders.findById(pendingOrderId);
-    }
+    if (pendingOrderId) { pendingOrder = await PendingOrders.findById(pendingOrderId); }
 
-    if (!pendingOrder && paymentLinkId) {
-        pendingOrder = await PendingOrders.findByPaymentLinkId(paymentLinkId);
-    }
+    if (!pendingOrder && paymentLinkId) { pendingOrder = await PendingOrders.findByPaymentLinkId(paymentLinkId); }
 
     if (!pendingOrder) {
         console.warn('Pending order not found for payment intent', paymentIntent.id, 'link', paymentLinkId);
         return;
     }
 
-    if (pendingOrder.status !== 'pending') {
-        return;
-    }
+    if (pendingOrder.status !== 'pending') { return; }
 
     let cartItems = pendingOrder.cart;
     if (!Array.isArray(cartItems)) {
@@ -72,16 +68,9 @@ async function finalizePendingOrder(paymentIntent) {
     try {
         await connection.query('BEGIN');
 
-        const receiptId = await Receipt.createReceipt(
-            pendingOrder.employee_id,
-            pendingOrder.total_amount,
-            'Card',
-            connection
-        );
+        const receiptId = await Receipt.createReceipt(pendingOrder.employee_id, pendingOrder.total_amount, 'Card', connection);
 
-        for (const item of cartItems) {
-            await fulfillCartItem(item, receiptId, connection);
-        }
+        for (const item of cartItems) { await fulfillCartItem(item, receiptId, connection); }
 
         await PendingOrders.markCompleted(connection, pendingOrder.id, paymentIntent.id, receiptId);
 
