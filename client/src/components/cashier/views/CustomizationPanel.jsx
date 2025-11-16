@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TranslatedText from "../../common/TranslateText.jsx";
 import '../css/order-panel.css';
 
 const CustomizationPanel = ({ drink, onClose, onAdd }) => {
@@ -73,11 +74,11 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
                 {/* Header with Cancel and Add buttons */}
                 <div className="panel-header">
                     <button className="panel-btn" onClick={onClose}>
-                        Cancel
+                        <TranslatedText text={'Cancel'}/>
                     </button>
-                    <h2 className="panel-title">{drink.name}</h2>
+                    <h2 className="panel-title"><TranslatedText text={drink.name}/></h2>
                     <button className="panel-btn panel-btn-primary" onClick={handleAdd}>
-                        Add
+                        <TranslatedText text={'Add'}/>
                     </button>
                 </div>
 
@@ -86,7 +87,7 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
                     {/* Ice Level Section */}
                     <section className="customization-section">
-                        <h3 className="section-title">Ice Level</h3>
+                        <h3 className="section-title"><TranslatedText text={'Ice Level'}/></h3>
                         <div className="option-grid">
                             {iceOptions.map(option => {
                                 const isSelected = isIceSelected(option);
@@ -98,7 +99,7 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
                                 return (
                                     <button key={option} className={buttonClass} onClick={() => setIceLevel(option)}>
-                                        {option}
+                                        <TranslatedText text={option}/>
                                     </button>
                                 );
                             })}
@@ -107,7 +108,7 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
                     {/* Sweetness Level Section */}
                     <section className="customization-section">
-                        <h3 className="section-title">Sweetness Level</h3>
+                        <h3 className="section-title"><TranslatedText text={'Sweetness Level'}/></h3>
                         <div className="option-grid">
                             {sweetnessOptions.map(option => {
                                 const isSelected = isSweetnessSelected(option);
@@ -119,7 +120,7 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
                                 return (
                                     <button key={option} className={buttonClass} onClick={() => setSweetness(option)}>
-                                        {option}
+                                        <TranslatedText text={option}/>
                                     </button>
                                 );
                             })}
@@ -140,7 +141,7 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
                                 return (
                                     <button key={option} className={buttonClass} onClick={() => toggleTopping(option)}>
-                                        {option}
+                                        <TranslatedText text={option}/>
                                     </button>
                                 );
                             })}

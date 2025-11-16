@@ -4,13 +4,35 @@
  */
 
 import { createContext, useContext, useState, useMemo } from 'react';
+import { translationAPI } from "../services/api.js";
 
 const TranslationContext = createContext(null);
 
 // wraps frontend content that translation should be applied to
 export function TranslationWrapper({ children }) {
     const [language, setLanguage] = useState('en');
-    const value = useMemo(() => ({ language, setLanguage }), [language]);
+
+    async function translate(text){
+        if(!text) { return '';}
+        if(language === 'en'){ return text; }
+
+        try{
+            const response = await translationAPI.translate(text, language);
+            if(response.data && response.data.translatedText){
+                return response.data.translatedText;
+            }
+            return text;
+        } catch(e){
+            console.error('Error translating: ', e);
+            return text;
+        }
+    }
+    const value = useMemo(() => ({
+        language,
+        setLanguage,
+        translate,
+    }), [language]);
+
     return (
         <TranslationContext.Provider value={value}>
             {children}

@@ -40,4 +40,9 @@ export const managerAPI = {
     peakDay: () => api.get('/manager/analytics/peak-day'),
 };
 
-export default { employeeAPI, drinkAPI, orderAPI, managerAPI };
+export const translationAPI = {
+    translate: (text, targetLanguage) =>
+        api.post('/translate', { text, targetLanguage}),
+};
+
+export default { employeeAPI, drinkAPI, orderAPI, managerAPI, translationAPI };

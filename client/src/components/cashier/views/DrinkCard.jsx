@@ -1,5 +1,6 @@
 import React from 'react';
 import currency from 'currency.js';
+import TranslateText from '../../common/TranslateText.jsx';
 import '../css/order-panel.css';
 
 const DrinkCard = ({drink, onSelect}) => {
@@ -14,7 +15,7 @@ const DrinkCard = ({drink, onSelect}) => {
 
         <div className="drink-card" onClick = { drinkSelection }>
             <img src={ imageURL } alt={ drink.name } className="drink-image"/>
-            <h3 className="drink-name"> { drink.name } </h3>
+            <h3 className="drink-name"> <TranslateText text={ drink.name } /></h3>
             <p className="drink-price"> { formattedPrice } </p>
         </div>
     );
