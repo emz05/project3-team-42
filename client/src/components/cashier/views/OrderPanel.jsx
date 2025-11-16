@@ -8,6 +8,7 @@ import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import DrinkCard from "./DrinkCard.jsx";
 import CartCard from "./CartCard.jsx";
 import {drinkAPI, orderAPI} from "../../../services/api.js";
+import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 
 const OrderPanel = () => {
     const [employee, setEmployee] = useState(null);
@@ -197,6 +198,7 @@ const OrderPanel = () => {
     return (
         <div className="order-panel">
             <header className="order-header">
+                <div className="order-language-dropdown"> <LanguageDropdown/></div>
                 <h1 className="header-title">Cashier View</h1>
                 <button className="logout-btn" onClick={handleLogout}>
                     Logout

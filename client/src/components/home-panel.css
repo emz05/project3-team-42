@@ -42,3 +42,11 @@ body {
     gap: 50px;
     margin-top: 350px;
 }
+
+.language-dropdown {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+
