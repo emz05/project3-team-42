@@ -21,7 +21,7 @@ router.post('/session', async (req, res) => {
         });
 
         res.json({
-            paymentIntentId: paymentIntent.id,
+            paymentId: paymentIntent.id,
             clientSecret: paymentIntent.client_secret,
         });
     } catch (error) {
@@ -29,5 +29,25 @@ router.post('/session', async (req, res) => {
         res.status(500).json({ error: 'Unable to start card payment' });
     }
 });
+
+// return client secret for given payment
+router.get('/status/:paymentId', async (req, res) => {
+    const { paymentId } = req.params;
+
+    try {
+        const payment = await stripe.paymentIntents.retrieve(paymentId);
+
+        res.json({
+            clientSecret: payment.client_secret,
+            status: payment.status,
+            amount: payment.amount,
+        });
+    } catch (error) {
+        console.error('lookup payment error:', error);
+        res.status(404).json({ error: 'Payment not found' });
+    }
+});
+
+
 
 module.exports = router;
