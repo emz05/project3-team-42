@@ -11,7 +11,6 @@ import ItemPage from './components/kiosk/views/ItemPage.jsx';
 import CustomizePage from './components/kiosk/views/CustomizePage.jsx';
 import ReviewPage from './components/kiosk/views/ReviewPage.jsx';
 import ConfirmationPage from './components/kiosk/views/ConfirmationPage.jsx';
-import PayPage from './components/common/PayPage.jsx';
 
 import ManagerLogin from './components/manager/ManagerLogin.jsx';
 import ManagerPanel from './components/manager/ManagerPanel.jsx';
@@ -42,7 +41,6 @@ function Client() {
                 {/* set paths for cashier */}
                 <Route path="/cashier/login" element={<LoginPanel />} />
                 <Route path="/cashier/order" element={<OrderPanel />} />
-                  <Route path="/pay/:paymentId" element={<PayPage />} />
 
                 {/* kiosk */}
                 <Route path="/kiosk" element={<KioskHomePage />} />
@@ -88,5 +86,4 @@ function Client() {
 
 
 export default Client;
-
 

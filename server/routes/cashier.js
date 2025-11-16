@@ -3,9 +3,8 @@ const router = express.Router();
 const Employee = require('../models/employee');
 const Drink = require('../models/drinks');
 const Receipt = require('../models/receipt');
-const Orders = require('../models/orders');
-const Inventory = require('../models/inventory');
 const pool = require('../database');
+const { fulfillCartItem } = require('../models/orderFulfillment');
 
 
 const drinkObj = (drink) => ({
@@ -83,29 +82,6 @@ router.get('/next-order-num', async (req, res) => {
     }
 });
 
-const processOrder = async (item, receiptID, connection) => {
-    await Orders.addOrderItem(
-        receiptID,
-        item.drinkID,
-        item.quantity,
-        item.totalPrice,
-        item.iceLevel,
-        item.sweetness,
-        item.toppings.join(', '),
-        connection
-    );
-
-    await Inventory.updateDrinkIngredients(item.drinkID, item.quantity, connection);
-
-    if(item.toppings && item.toppings.length > 0){
-        for(const topping of item.toppings){
-            await Inventory.updateTopping(topping, item.quantity, connection);
-        }
-    }
-
-    await Inventory.updateLowStockStatus(item.drinkID, item.toppings, connection);
-};
-
 router.post('/process-order', async (req, res) => {
     const connection = await pool.connect();
 
@@ -125,7 +101,9 @@ router.post('/process-order', async (req, res) => {
         const receiptID = await Receipt.createReceipt(employeeID, totalAmount, paymentMethod, connection);
 
         // updates Orders table
-        for(const card of cartCards){ await processOrder(card, receiptID, connection) };
+        for(const card of cartCards){
+            await fulfillCartItem(card, receiptID, connection);
+        }
 
         await connection.query('COMMIT');
 
@@ -140,4 +118,3 @@ router.post('/process-order', async (req, res) => {
 });
 
 module.exports = router;
-

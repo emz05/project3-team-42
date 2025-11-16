@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TranslatedText from "../../common/TranslateText.jsx";
 import '../css/order-panel.css';
 
 const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
     const [currentDate] = useState(new Date());
+    const [phoneNumber, setPhoneNumber] = useState('');
 
-    useEffect(() => {
-        const timer = setTimeout(onClose, 10000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
+    const handlePrintReceipt = () => {
+        window.print();
+    };
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -46,6 +46,19 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
                         <span className="detail-label"><TranslatedText text="Total:" /></span>
                         <span className="detail-value">${total.toFixed(2)}</span>
                     </div>
+                </div>
+
+                <div className="receipt-input-group">
+                    <input
+                        type="tel"
+                        className="receipt-input"
+                        placeholder="Enter phone number"
+                        value={phoneNumber}
+                        onChange={(event) => setPhoneNumber(event.target.value)}
+                    />
+                    <button className="receipt-button" onClick={handlePrintReceipt}>
+                        <TranslatedText text="Print Receipt" />
+                    </button>
                 </div>
             </div>
         </div>
