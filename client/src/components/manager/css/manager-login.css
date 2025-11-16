@@ -1,9 +1,88 @@
-/* Placeholder login styles */
-.manager-login-container { display: flex; align-items: center; justify-content: center; height: 100vh; background: #f7f7f8; }
-.manager-login-box { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px 28px; width: 340px; text-align: center; }
-.manager-login-box h1 { margin: 0 0 10px; font-size: 22px; color: #111827; }
-.manager-login-box p { margin: 0 0 18px; color: #6b7280; }
-.google-btn { display: inline-block; width: 100%; padding: 10px 12px; border-radius: 8px; background: #1f2937; color: #e5e7eb; text-decoration: none; cursor: pointer; }
-.google-btn.disabled { opacity: 0.55; cursor: not-allowed; }
-.note { margin-top: 10px; font-size: 12px; color: #9ca3af; }
+.manager-login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 
+  background: white;
+}
+
+.manager-login-box {
+  background: #ffffff;
+  border-radius: 28px;
+
+  padding: 5vh 6vh;
+  width: min(80vw, 80vh);
+
+  box-shadow: 0px 20px 100px rgba(12, 0, 1, 0.12);
+}
+
+.manager-login-box h1 {
+  margin: 0 0 14px;
+  font-size: 2.2rem;
+  color: #e63946; 
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.manager-login-box p {
+  margin: 0 0 24px;
+  color: #6b7280;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.google-login-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  transform: scale(1.6);
+  transform-origin: center;
+}
+
+.error-banner {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 14px;
+
+  background: white;
+  color: #b91c1c;
+
+  font-size: 15px;
+  text-align: left;
+
+  box-shadow: 0px 20px 100px rgba(12, 0, 1, 0.12);
+}
+
+.missing-config {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+
+  background: white;
+  color: #b45309;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.note {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.note ul {
+  text-align: left;
+  margin: 10px 0 0;
+  padding-left: 20px;
+
+  list-style: disc;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.note li {
+  margin-bottom: 6px;
+}
