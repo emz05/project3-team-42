@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
+import TranslatedText from "../../common/TranslateText.jsx";
 
 export default function CategoriesPage() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function CategoriesPage() {
   return (
     <div className="kiosk-container">
         <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
-      <h2>Select a Category</h2>
+      <h2><TranslatedText text={'Select a Category'}/></h2>
 
       <div className="kiosk-grid">
         {categories.map((cat) => (
@@ -24,7 +25,7 @@ export default function CategoriesPage() {
             className="kiosk-card"
             onClick={() => navigate(`/kiosk/categories/${cat.id}`)}
           >
-            <h3>{cat.name}</h3>
+            <h3><TranslatedText text={cat.name}/></h3>
           </div>
         ))}
       </div>
