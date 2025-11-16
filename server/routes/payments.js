@@ -1,53 +1,98 @@
-const express = require('express');
 const Stripe = require('stripe');
+const pool = require('../database');
+const Receipt = require('../models/receipt');
+const { fulfillCartItem } = require('../orderFulfillment');
+const PendingOrders = require('../models/pendingOrders');
 
-const router = express.Router();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// client calls when card payment from cashier side
-router.post('/session', async (req, res) => {
-    const { orderId, amount, currency = 'usd' } = req.body;
-
-    if (!orderId || !amount) {
-        return res.status(400).json({ error: 'orderId and amount are required' });
-    }
+const webhookHandler = async (req, res) => {
+    const signature = req.headers['stripe-signature'];
+    let event;
 
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
-            // amount expected in cents
-            amount: Math.round(amount * 100),
-            currency,
-            metadata: { orderId },
-        });
-
-        res.json({
-            paymentId: paymentIntent.id,
-            clientSecret: paymentIntent.client_secret,
-        });
+        event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
     } catch (error) {
-        console.error('create session error:', error);
-        res.status(500).json({ error: 'Unable to start card payment' });
+        console.error('Webhook signature verification failed:', error.message);
+        res.status(400).send(`Webhook Error: ${error.message}`);
+        return;
     }
-});
 
-// return client secret for given payment
-router.get('/status/:paymentId', async (req, res) => {
-    const { paymentId } = req.params;
+    console.log('Stripe webhook event:', event.type);
+
+    if (event.type === 'payment_intent.succeeded') {
+        try {
+            const paymentIntent = event.data.object;
+            console.log('PaymentIntent metadata:', paymentIntent.metadata, 'payment_link:', paymentIntent.payment_link);
+            await finalizePendingOrder(paymentIntent);
+        } catch (error) {
+            console.error('Failed to finalize pending order:', error);
+        }
+    }
+
+    res.json({ received: true });
+};
+
+async function finalizePendingOrder(paymentIntent) {
+    const metadata = paymentIntent.metadata || {};
+    const pendingOrderId = metadata.pendingOrderId;
+    const paymentLinkId = paymentIntent.payment_link;
+
+    let pendingOrder = null;
+
+    if (pendingOrderId) {
+        pendingOrder = await PendingOrders.findById(pendingOrderId);
+    }
+
+    if (!pendingOrder && paymentLinkId) {
+        pendingOrder = await PendingOrders.findByPaymentLinkId(paymentLinkId);
+    }
+
+    if (!pendingOrder) {
+        console.warn('Pending order not found for payment intent', paymentIntent.id, 'link', paymentLinkId);
+        return;
+    }
+
+    if (pendingOrder.status !== 'pending') {
+        return;
+    }
+
+    let cartItems = pendingOrder.cart;
+    if (!Array.isArray(cartItems)) {
+        try {
+            cartItems = JSON.parse(cartItems);
+        } catch (error) {
+            console.error('Unable to parse cart JSON for pending order', pendingOrder.id);
+            throw error;
+        }
+    }
+    const connection = await pool.connect();
 
     try {
-        const payment = await stripe.paymentIntents.retrieve(paymentId);
+        await connection.query('BEGIN');
 
-        res.json({
-            clientSecret: payment.client_secret,
-            status: payment.status,
-            amount: payment.amount,
-        });
+        const receiptId = await Receipt.createReceipt(
+            pendingOrder.employee_id,
+            pendingOrder.total_amount,
+            'Card',
+            connection
+        );
+
+        for (const item of cartItems) {
+            await fulfillCartItem(item, receiptId, connection);
+        }
+
+        await PendingOrders.markCompleted(connection, pendingOrder.id, paymentIntent.id, receiptId);
+
+        await connection.query('COMMIT');
     } catch (error) {
-        console.error('lookup payment error:', error);
-        res.status(404).json({ error: 'Payment not found' });
+        await connection.query('ROLLBACK');
+        console.error('finalize pending order error:', error);
+        throw error;
+    } finally {
+        connection.release();
     }
-});
+}
 
-
-
-module.exports = router;
+module.exports = { webhookHandler };

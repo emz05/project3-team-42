@@ -10,7 +10,7 @@ import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import { useTranslation } from '../../../context/translation-storage.jsx';
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
-import { drinkAPI, orderAPI, paymentsAPI } from "../../../services/api.js";
+import { drinkAPI, orderAPI, pendingOrderAPI } from "../../../services/api.js";
 import '../css/order-panel.css'
 
 const OrderPanel = () => {
@@ -29,6 +29,9 @@ const OrderPanel = () => {
     const [cashReceived, setCashReceived] = useState('');
     const [changeDue, setChangeDue] = useState(null);
     const [showCashPanel, setShowCashPanel] = useState(false);
+    const [pendingOrderId, setPendingOrderId] = useState(null);
+    const [pendingTotal, setPendingTotal] = useState(0);
+    const [confirmationReceiptId, setConfirmationReceiptId] = useState(null);
 
 
 
@@ -63,10 +66,8 @@ const OrderPanel = () => {
 
     }, [navigate]);
 
-    // allows for transaction processing only when Stripe sends success
-    // monitors success of payment
     useEffect(() => {
-        if (!paymentSession || !paymentSession.paymentId) {
+        if (!pendingOrderId) {
             return undefined;
         }
 
@@ -75,22 +76,19 @@ const OrderPanel = () => {
 
         const checkStatus = async () => {
             try {
-                const { data } = await paymentsAPI.lookupPayment(paymentSession.paymentId);
+                const { data } = await pendingOrderAPI.status(pendingOrderId);
                 if (cancelled) {
                     return;
                 }
 
-                const succeeded = data.status === 'succeeded';
-
-                if (succeeded) {
-                    setPaymentSession(null);
-                    await processTransaction('Card');
+                if (data.status === 'paid') {
+                    handlePendingOrderPaid(data.receiptId);
                     return;
                 }
 
                 timeoutId = setTimeout(checkStatus, 4000);
             } catch (error) {
-                console.error('check payment status', error);
+                console.error('pending order status', error);
                 timeoutId = setTimeout(checkStatus, 4000);
             }
         };
@@ -103,7 +101,7 @@ const OrderPanel = () => {
                 clearTimeout(timeoutId);
             }
         };
-    }, [paymentSession?.paymentId]);
+    }, [pendingOrderId]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('employee');
@@ -196,18 +194,45 @@ const OrderPanel = () => {
         alert(await translate(`Applied ${discount} discount`));
     };
 
+    const handlePendingOrderPaid = (receiptId) => {
+        const paidTotal = pendingTotal || total;
+        setPaymentSession(null);
+        setPendingOrderId(null);
+        setPaymentMethod('');
+        setPendingTotal(0);
+        setConfirmationReceiptId(receiptId || null);
+        setFinalTotal(paidTotal);
+        setShowPaymentConfirmation(true);
+        setOrderNumber(orderNumber + 1);
+        setCartItems([]);
+        setPointsInput('');
+        setAppliedPoints(0);
+        setCashReceived('');
+        setChangeDue(null);
+        fetchOrderNumber();
+    };
+
     // completes order depending on selected method type
     const handleSelectPayment = async (method) => {
         setPaymentMethod(method);
 
         if (method === 'Card') {
             try {
-                const { data } = await paymentsAPI.createSession({
+                if (!employee) {
+                    alert(await translate('Employee not found. Please log in again.'));
+                    return;
+                }
+                const { data } = await pendingOrderAPI.create({
                     orderId: orderNumber,
-                    amount: subtotal + tax,
+                    employeeId: employee.id,
+                    cartCards: cartItems,
+                    totalAmount: total,
                 });
-                const url = `${window.location.origin}/pay/${data.paymentId}`;
-                setPaymentSession({ url, paymentId: data.paymentId  });
+                setPendingTotal(total);
+                setPendingOrderId(data.pendingOrderId);
+                setPaymentSession({
+                    url: data.url,
+                });
             } catch (error) {
                 console.error(error);
                 alert(await translate('Unable to start card payment.'));
@@ -215,6 +240,8 @@ const OrderPanel = () => {
             }
         } else if (method === 'Cash') {
             setPaymentSession(null);
+            setPendingOrderId(null);
+            setPendingTotal(0);
             setShowCashPanel(true);
         }
     };
@@ -297,11 +324,14 @@ const OrderPanel = () => {
             if(sendOrder.data.success){
                 setFinalTotal(total);
                 setShowPaymentConfirmation(true);
+                setConfirmationReceiptId(sendOrder.data.receiptID || null);
                 setOrderNumber(orderNumber + 1);
                 setCartItems([]);
                 setPointsInput('');
                 setAppliedPoints(0);
                 setPaymentMethod('');
+                setPendingOrderId(null);
+                setPendingTotal(0);
             }
         } catch(e){
             console.error('Error processing order: ', e);
@@ -436,15 +466,15 @@ const OrderPanel = () => {
 
 
             {paymentMethod === 'Card' && paymentSession && (
-                <div className="qr-overlay" onClick={() => { setPaymentSession(null); setPaymentMethod(''); }}>
+                <div className="qr-overlay" onClick={() => { setPaymentSession(null); }}>
                     <div className="qr-card" onClick={(e) => e.stopPropagation()}>
                         <h3><TranslatedText text="Scan to pay" /></h3>
                         <div className="qr-code-wrapper">
                             <QRCode value={paymentSession.url} size={220} /></div>
                             <p><TranslatedText text="Please Scan and Make Payment on Device" /></p>
-                            <button onClick={() => { setPaymentSession(null); setPaymentMethod(''); }}>
-                                <TranslatedText text="Cancel" />
-                            </button>
+                        <button onClick={() => { setPaymentSession(null); }}>
+                            <TranslatedText text="Cancel" />
+                        </button>
                     </div>
                 </div>
             )}

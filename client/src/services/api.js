@@ -42,9 +42,9 @@ export const translationAPI = {
         api.post('/translate', { text, targetLanguage}),
 };
 
-export const paymentsAPI = {
-    createSession: (payload) => api.post('/payments/session', payload),
-    lookupPayment: (paymentId) => api.get(`/payments/status/${paymentId}`),
+export const pendingOrderAPI = {
+    create: (payload) => api.post('/pending-orders', payload),
+    status: (id) => api.get(`/pending-orders/${id}`),
 };
 
-export default { employeeAPI, drinkAPI, orderAPI, managerAPI, translationAPI, paymentsAPI };
+export default { employeeAPI, drinkAPI, orderAPI, managerAPI, translationAPI, pendingOrderAPI };

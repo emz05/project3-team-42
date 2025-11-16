@@ -16,6 +16,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 const cors = require('cors');
 const pool = require('./database');
+const pendingOrdersRoutes = require('./routes/pendingOrders');
+const { webhookHandler } = require('./routes/payments');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -26,6 +28,12 @@ const corsOptions = {
     credentials: true
 };
 app.use(cors(corsOptions));
+
+app.post(
+    '/api/payments/webhook',
+    express.raw({ type: 'application/json' }),
+    webhookHandler
+);
 
 app.use(express.json());
 
@@ -57,8 +65,7 @@ app.use('/api/manager', manager);
 const translation = require('./routes/translation');
 app.use('/api/translate', translation);
 
-const paymentRoutes = require('./routes/payments');
-app.use('/api/payments', paymentRoutes);
+app.use('/api/pending-orders', pendingOrdersRoutes);
 
 
 // Add process hook to shutdown pool
