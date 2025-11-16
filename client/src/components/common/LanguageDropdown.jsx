@@ -10,6 +10,7 @@ const LANGUAGES = [
     { value: 'fr', label: 'Français' },
     { value: 'vi', label: 'Tiếng Việt' },
     { value: 'zh', label: '中文 (简体)' },
+    // add more later on
 ];
 
 export default function LanguageDropdown({ className }) {
