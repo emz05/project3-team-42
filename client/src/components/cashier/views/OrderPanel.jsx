@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import currency from 'currency.js';
+import QRCode from 'react-qr-code';
 import SlideTabs from "./Tabs";
 import DrinkCard from "./DrinkCard.jsx";
 import CartCard from "./CartCard.jsx";
@@ -9,7 +10,7 @@ import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import { useTranslation } from '../../../context/translation-storage.jsx';
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
-import {drinkAPI, orderAPI} from "../../../services/api.js";
+import { drinkAPI, orderAPI, pendingOrderAPI } from "../../../services/api.js";
 import '../css/order-panel.css'
 
 const OrderPanel = () => {
@@ -24,6 +25,14 @@ const OrderPanel = () => {
     const [orderNumber, setOrderNumber] = useState(1);
     const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
     const [finalTotal, setFinalTotal] = useState(0);
+    const [paymentSession, setPaymentSession] = useState(null);
+    const [cashReceived, setCashReceived] = useState('');
+    const [changeDue, setChangeDue] = useState(null);
+    const [showCashPanel, setShowCashPanel] = useState(false);
+    const [pendingOrderId, setPendingOrderId] = useState(null);
+    const [pendingTotal, setPendingTotal] = useState(0);
+    const [confirmationReceiptId, setConfirmationReceiptId] = useState(null);
+
 
 
     const navigate = useNavigate();
@@ -56,6 +65,43 @@ const OrderPanel = () => {
         fetchOrderNumber();
 
     }, [navigate]);
+
+    useEffect(() => {
+        if (!pendingOrderId) {
+            return undefined;
+        }
+
+        let cancelled = false;
+        let timeoutId;
+
+        const checkStatus = async () => {
+            try {
+                const { data } = await pendingOrderAPI.status(pendingOrderId);
+                if (cancelled) {
+                    return;
+                }
+
+                if (data.status === 'paid') {
+                    handlePendingOrderPaid(data.receiptId);
+                    return;
+                }
+
+                timeoutId = setTimeout(checkStatus, 4000);
+            } catch (error) {
+                console.error('pending order status', error);
+                timeoutId = setTimeout(checkStatus, 4000);
+            }
+        };
+
+        checkStatus();
+
+        return () => {
+            cancelled = true;
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    }, [pendingOrderId]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('employee');
@@ -148,10 +194,105 @@ const OrderPanel = () => {
         alert(await translate(`Applied ${discount} discount`));
     };
 
+    const handlePendingOrderPaid = (receiptId) => {
+        const paidTotal = pendingTotal || total;
+        setPaymentSession(null);
+        setPendingOrderId(null);
+        setPaymentMethod('');
+        setPendingTotal(0);
+        setConfirmationReceiptId(receiptId || null);
+        setFinalTotal(paidTotal);
+        setShowPaymentConfirmation(true);
+        setOrderNumber(orderNumber + 1);
+        setCartItems([]);
+        setPointsInput('');
+        setAppliedPoints(0);
+        setCashReceived('');
+        setChangeDue(null);
+        fetchOrderNumber();
+    };
+
+    // completes order depending on selected method type
+    const handleSelectPayment = async (method) => {
+        setPaymentMethod(method);
+
+        if (method === 'Card') {
+            try {
+                if (!employee) {
+                    alert(await translate('Employee not found. Please log in again.'));
+                    return;
+                }
+                const { data } = await pendingOrderAPI.create({
+                    orderId: orderNumber,
+                    employeeId: employee.id,
+                    cartCards: cartItems,
+                    totalAmount: total,
+                });
+                setPendingTotal(total);
+                setPendingOrderId(data.pendingOrderId);
+                setPaymentSession({
+                    url: data.url,
+                });
+            } catch (error) {
+                console.error(error);
+                alert(await translate('Unable to start card payment.'));
+                setPaymentMethod('');
+            }
+        } else if (method === 'Cash') {
+            setPaymentSession(null);
+            setPendingOrderId(null);
+            setPendingTotal(0);
+            setShowCashPanel(true);
+        }
+    };
+
+    // upon cash, validate input, compute change, close panel
+    const handleCashConfirm = async () => {
+        const received = parseFloat(cashReceived);
+        if (Number.isNaN(received)) {
+            alert(await translate('Enter the amount received.'));
+            return;
+        }
+        if (received < total) {
+            alert(await translate('Cash received must cover the total.'));
+            return;
+        }
+
+        setChangeDue(received - total);
+    };
+
+    // upon charge button, validate cash payment | await processing transaction until card charged
+    const handleCharge = async () => {
+        if (paymentMethod === 'Cash') {
+            const received = parseFloat(cashReceived);
+            if (Number.isNaN(received)) {
+                alert(await translate('Enter the amount received.'));
+                return;
+            }
+            if (received < total) {
+                alert(await translate('Cash received must cover the total.'));
+                return;
+            }
+
+            const change = received - total;
+            setChangeDue(change);
+            await processTransaction();
+            return;
+        }
+
+        if (paymentMethod === 'Card') {
+            alert(await translate('Complete the card payment before charging.'));
+            return;
+        }
+
+        await processTransaction();
+    };
+
     // process payment and complete order
-    const processTransaction = async () => {
+    const processTransaction = async (methodOverride) => {
+        const methodToUse = methodOverride || paymentMethod;
         const cartIsEmpty = cartItems.length === 0;
-        const noPaymentMethod = !paymentMethod;
+        const noPaymentMethod = !methodToUse;
 
         if (cartIsEmpty) {
             alert(await translate('Cart is empty'));
@@ -175,7 +316,7 @@ const OrderPanel = () => {
                     toppings: obj.toppings
                 })),
                 totalAmount: total,
-                paymentMethod: paymentMethod
+                paymentMethod: methodToUse,
             };
 
             const sendOrder = await orderAPI.processOrder(orderData);
@@ -183,11 +324,14 @@ const OrderPanel = () => {
             if(sendOrder.data.success){
                 setFinalTotal(total);
                 setShowPaymentConfirmation(true);
+                setConfirmationReceiptId(sendOrder.data.receiptID || null);
                 setOrderNumber(orderNumber + 1);
                 setCartItems([]);
                 setPointsInput('');
                 setAppliedPoints(0);
                 setPaymentMethod('');
+                setPendingOrderId(null);
+                setPendingTotal(0);
             }
         } catch(e){
             console.error('Error processing order: ', e);
@@ -261,7 +405,7 @@ const OrderPanel = () => {
                                 className="points-input"
                                 value={pointsInput}
                                 onChange={(e) => setPointsInput(e.target.value)}
-                                placeholder="0"
+                                placeholder="0.00"
                             />
                             <button className="apply-points-btn" onClick={applyPoints}>
                                 <TranslatedText text={'APPLY'} />
@@ -276,13 +420,13 @@ const OrderPanel = () => {
                         <div className="payment-methods">
                             <button
                                 className={`payment-btn ${paymentMethod === 'Card' && 'selected'}`}
-                                onClick={() => setPaymentMethod('Card')}
+                                onClick={() => handleSelectPayment('Card')}
                             >
                                 <TranslatedText text={'Card'} />
                             </button>
                             <button
                                 className={`payment-btn ${paymentMethod === 'Cash' && 'selected'}`}
-                                onClick={() => setPaymentMethod('Cash')}
+                                onClick={() => handleSelectPayment('Cash')}
                             >
                                 <TranslatedText text={'Cash'} />
                             </button>
@@ -290,7 +434,7 @@ const OrderPanel = () => {
 
                         <button
                             className="charge-btn"
-                            onClick={processTransaction}
+                            onClick={handleCharge}
                             disabled={cartItems.length === 0 || !paymentMethod}
                         >
                             <TranslatedText text={'Charge Customer'} />
@@ -298,6 +442,42 @@ const OrderPanel = () => {
                     </div>
                 </div>
             </div>
+
+            {paymentMethod === 'Cash' && showCashPanel && (
+                <div className="qr-overlay" onClick={() => setShowCashPanel(false)}>
+                    <div className="qr-card" onClick={(e) => e.stopPropagation()}>
+                        <button className="qr-close" onClick={() => setShowCashPanel(false)}>×</button>
+                        <h3><TranslatedText text="Enter cash received" /></h3>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={cashReceived}
+                            onChange={(event) => setCashReceived(event.target.value)}
+                            placeholder="0.00"
+                        />
+                        {changeDue !== null && (
+                            <p><TranslatedText text="Change due" />: {currency(changeDue).format()}</p>
+                        )}
+                        <button onClick={handleCashConfirm}><TranslatedText text="Confirm" /></button>
+                    </div>
+                </div>
+            )}
+
+
+            {paymentMethod === 'Card' && paymentSession && (
+                <div className="qr-overlay" onClick={() => { setPaymentSession(null); }}>
+                    <div className="qr-card" onClick={(e) => e.stopPropagation()}>
+                        <h3><TranslatedText text="Scan to pay" /></h3>
+                        <div className="qr-code-wrapper">
+                            <QRCode value={paymentSession.url} size={220} /></div>
+                            <p><TranslatedText text="Please Scan and Make Payment on Device" /></p>
+                        <button onClick={() => { setPaymentSession(null); }}>
+                            <TranslatedText text="Cancel" />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {selectedDrink && (
                 <CustomizationPanel
