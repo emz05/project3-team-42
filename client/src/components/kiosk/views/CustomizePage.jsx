@@ -1,3 +1,10 @@
+/*
+ * CustomizePage.jsx
+ * -----------------------
+ * - Lets kiosk users choose size, sugar, and ice levels for a drink.
+ * - Passes customization choices to the review page.
+ */
+
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
@@ -7,15 +14,19 @@ export default function CustomizePage() {
   const navigate = useNavigate();
   const { itemId } = useParams();
 
+  // Local customization options
   const [size, setSize] = useState("Medium");
   const [sugar, setSugar] = useState("50%");
   const [ice, setIce] = useState("50%");
 
   return (
     <div className="kiosk-container">
-        <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
+      {/* Language dropdown for kiosk */}
+      <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
+
       <h2><TranslatedText text={'Customize Your Drink'}/></h2>
 
+      {/* Size, sugar, and ice selection controls */}
       <div className="kiosk-options">
         <label><TranslatedText text={'Size:'}/></label>
         <select value={size} onChange={(e) => setSize(e.target.value)}>
@@ -43,15 +54,19 @@ export default function CustomizePage() {
         </select>
       </div>
 
+      {/* Continue to order review */}
       <button
         className="kiosk-button"
-        onClick={() => navigate("/kiosk/review", { state: { itemId, size, sugar, ice } })}
+        onClick={() =>
+          navigate("/kiosk/review", { state: { itemId, size, sugar, ice } })
+        }
       >
-          <TranslatedText text={'Review Order'}/>
+        <TranslatedText text={'Review Order'}/>
       </button>
 
+      {/* Back navigation */}
       <button className="kiosk-nav" onClick={() => navigate(-1)}>
-          <TranslatedText text={'Back'}/>
+        <TranslatedText text={'Back'}/>
       </button>
     </div>
   );
