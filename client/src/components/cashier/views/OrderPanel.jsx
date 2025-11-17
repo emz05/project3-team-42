@@ -291,6 +291,11 @@ const OrderPanel = () => {
     // process payment and complete order
     const processTransaction = async (methodOverride) => {
         const methodToUse = methodOverride || paymentMethod;
+
+        if (methodToUse === 'Card') {
+            console.warn('processTransaction skipped for card payments; webhook handles receipt creation.');
+            return;
+        }
         const cartIsEmpty = cartItems.length === 0;
         const noPaymentMethod = !methodToUse;
 
@@ -435,7 +440,7 @@ const OrderPanel = () => {
                         <button
                             className="charge-btn"
                             onClick={handleCharge}
-                            disabled={cartItems.length === 0 || !paymentMethod}
+                            disabled={cartItems.length === 0 || !paymentMethod || paymentMethod === 'Card'}
                         >
                             <TranslatedText text={'Charge Customer'} />
                         </button>
