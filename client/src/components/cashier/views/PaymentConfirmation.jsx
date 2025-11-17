@@ -1,10 +1,17 @@
+/*
+ * PaymentConfirmation.jsx
+ * -----------------------
+ * - Displays a modal after a cashier completes payment.
+ * - Shows order details and allows printing a receipt.
+ */
+
 import React, { useState } from 'react';
 import TranslatedText from "../../common/TranslateText.jsx";
 import '../css/order-panel.css';
 
 const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
-    const [currentDate] = useState(new Date());
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [currentDate] = useState(new Date());          // timestamp for receipt
+    const [phoneNumber, setPhoneNumber] = useState('');  // optional phone input
 
     const handlePrintReceipt = () => {
         window.print();
@@ -19,10 +26,16 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
                         <path d="M30 50 L45 65 L70 35" stroke="white" strokeWidth="6" fill="none" />
                     </svg>
                 </div>
-                <h2 className="payment-title"><TranslatedText text="Payment Successful!" /></h2>
 
+                <h2 className="payment-title">
+                    <TranslatedText text="Payment Successful!" />
+                </h2>
+
+                {/* Transaction details section */}
                 <div className="payment-details">
-                    <h3 className="details-title"><TranslatedText text="Transaction Details" /></h3>
+                    <h3 className="details-title">
+                        <TranslatedText text="Transaction Details" />
+                    </h3>
 
                     <div className="detail-row">
                         <span className="detail-label"><TranslatedText text="Order ID:" /></span>
@@ -48,6 +61,7 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
                     </div>
                 </div>
 
+                {/* Phone + receipt print */}
                 <div className="receipt-input-group">
                     <input
                         type="tel"
