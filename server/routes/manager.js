@@ -4,6 +4,7 @@ const Drink = require('../models/drinks');
 const Receipt = require('../models/receipt');
 const Inventory = require('../models/inventory');
 const Employee = require('../models/employee');
+const pool = require('../database');
 
 const deriveSeasonal = (category) => {
   if (!category) return false;
@@ -69,6 +70,126 @@ router.delete('/drinks/:id', async (req, res) => {
   }
 });
 
+router.get('/orders', async (req, res) => {
+  try {
+    const { employeeId, dateFrom, dateTo } = req.query;
+    const filters = [];
+    const params = [];
+
+    if (employeeId) {
+      params.push(parseInt(employeeId, 10));
+      filters.push(`r.employee_id = $${params.length}`);
+    }
+
+    if (dateFrom) {
+      params.push(dateFrom);
+      filters.push(`r.transaction_date >= $${params.length}`);
+    }
+
+    if (dateTo) {
+      params.push(dateTo);
+      filters.push(`r.transaction_date <= $${params.length}`);
+    }
+
+    const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+
+    const sql = `
+      SELECT
+        r.id AS receipt_id,
+        r.transaction_date,
+        r.transaction_time,
+        r.amount AS total_amount,
+        r.payment_method,
+        r.employee_id,
+        e.first_name AS employee_first_name,
+        e.last_name AS employee_last_name,
+        'paid' AS status
+      FROM receipt r
+      LEFT JOIN employee e ON e.id = r.employee_id
+      ${whereClause}
+      ORDER BY r.id DESC
+      LIMIT 500
+    `;
+
+    const { rows } = await pool.query(sql, params);
+    res.json(rows);
+  } catch (e) {
+    console.error('Manager list orders', e);
+    res.status(500).json({ error: 'Failed to load orders' });
+  }
+});
+
+router.get('/employees', async (req, res) => {
+    try {
+        const rows = await Employee.listEmployees();
+        res.json(rows);
+    } catch (e) {
+        console.error('Manager list employees', e);
+        res.status(500).json({ error: 'Failed to load employees' });
+    }
+});
+
+router.get('/inventory', async (req, res) => {
+    try {
+        const report = await Inventory.list({ lowStock: false, page: 1, limit: 500 });
+        res.json(report.items || []);
+    } catch (e) {
+        console.error('Manager list inventory', e);
+        res.status(500).json({ error: 'Failed to load inventory' });
+    }
+});
+
+async function fetchDashboardData() {
+  const [
+    weeklySales,
+    hourlySales,
+    peakDay,
+    employeeList,
+    revenuePerEmployee,
+    ordersPerEmployee,
+    lowStockInventory,
+    drinkCounts,
+    ordersPerCategory,
+    salesPerDrink,
+    cheapDrinks,
+    highestReceipt,
+    xReport,
+    zReport,
+  ] = await Promise.all([
+    Receipt.getWeeklySalesHistory(),
+    Receipt.getHourlySalesHistory(),
+    Receipt.getPeakSalesDay(),
+    Employee.listEmployees(),
+    Receipt.getRevenuePerEmployee(),
+    Receipt.getOrdersPerEmployee(),
+    Inventory.getLowStockReport(),
+    Drink.getDrinkCountPerCategory(),
+    Drink.getOrdersPerCategory(),
+    Drink.getSalesPerDrink(),
+    Drink.getDrinksCheaperThan(5),
+    Receipt.getHighestReceiptAmount(),
+    Receipt.getXReport(),
+    Receipt.getZReport(),
+  ]);
+
+  return {
+    weeklySales,
+    hourlySales,
+    peakDay,
+    employees: employeeList,
+    revenuePerEmployee,
+    ordersPerEmployee,
+    lowStockInventory,
+    drinkCounts,
+    ordersPerCategory,
+    salesPerDrink,
+    cheapDrinks,
+    highestReceipt,
+    xReport,
+    zReport,
+  };
+}
+
 // Analytics endpoints
 router.get('/analytics/weekly-sales', async (req, res) => {
   try {
@@ -102,56 +223,20 @@ router.get('/analytics/peak-day', async (req, res) => {
 
 router.get('/analytics/dashboard', async (req, res) => {
   try {
-    const [
-      weeklySales,
-      hourlySales,
-      peakDay,
-      employeeList,
-      revenuePerEmployee,
-      ordersPerEmployee,
-      lowStockInventory,
-      drinkCounts,
-      ordersPerCategory,
-      salesPerDrink,
-      cheapDrinks,
-      highestReceipt,
-      xReport,
-      zReport,
-    ] = await Promise.all([
-      Receipt.getWeeklySalesHistory(),
-      Receipt.getHourlySalesHistory(),
-      Receipt.getPeakSalesDay(),
-      Employee.listEmployees(),
-      Receipt.getRevenuePerEmployee(),
-      Receipt.getOrdersPerEmployee(),
-      Inventory.getLowStockReport(),
-      Drink.getDrinkCountPerCategory(),
-      Drink.getOrdersPerCategory(),
-      Drink.getSalesPerDrink(),
-      Drink.getDrinksCheaperThan(5),
-      Receipt.getHighestReceiptAmount(),
-      Receipt.getXReport(),
-      Receipt.getZReport(),
-    ]);
-
-    res.json({
-      weeklySales,
-      hourlySales,
-      peakDay,
-      employees: employeeList,
-      revenuePerEmployee,
-      ordersPerEmployee,
-      lowStockInventory,
-      drinkCounts,
-      ordersPerCategory,
-      salesPerDrink,
-      cheapDrinks,
-      highestReceipt,
-      xReport,
-      zReport,
-    });
+    const payload = await fetchDashboardData();
+    res.json(payload);
   } catch (e) {
     console.error('Manager analytics dashboard: ', e);
+    res.status(500).json({ error: 'Failed to fetch dashboard data' });
+  }
+});
+
+router.get('/dashboard', async (req, res) => {
+  try {
+    const payload = await fetchDashboardData();
+    res.json(payload);
+  } catch (e) {
+    console.error('Manager dashboard: ', e);
     res.status(500).json({ error: 'Failed to fetch dashboard data' });
   }
 });
