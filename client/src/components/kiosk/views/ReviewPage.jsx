@@ -1,3 +1,10 @@
+/*
+ * ReviewPage.jsx
+ * -----------------------
+ * - Shows a summary of the user's drink customizations.
+ * - Allows confirming the order or going back to edit.
+ */
+
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
@@ -5,13 +12,16 @@ import TranslatedText from "../../common/TranslateText.jsx";
 
 export default function ReviewPage() {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const { state } = useLocation(); // contains itemId, size, sugar, ice
 
   return (
     <div className="kiosk-container">
-        <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
+      {/* Language selector for kiosk */}
+      <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
+
       <h2><TranslatedText text={'Your Order'}/></h2>
 
+      {/* Display chosen customization options */}
       <div className="kiosk-summary">
         <p><strong><TranslatedText text={'Drink ID:'}/></strong> {state?.itemId}</p>
         <p><strong><TranslatedText text={'Size:'}/></strong> {state?.size}</p>
@@ -19,12 +29,14 @@ export default function ReviewPage() {
         <p><strong><TranslatedText text={'Ice:'}/></strong> {state?.ice}</p>
       </div>
 
+      {/* Place order */}
       <button className="kiosk-button" onClick={() => navigate("/kiosk/confirmation")}>
-          <TranslatedText text={'Confirm Order'}/>
+        <TranslatedText text={'Confirm Order'}/>
       </button>
 
+      {/* Go back to customization */}
       <button className="kiosk-nav" onClick={() => navigate(-1)}>
-          <TranslatedText text={'Back'}/>
+        <TranslatedText text={'Back'}/>
       </button>
     </div>
   );
