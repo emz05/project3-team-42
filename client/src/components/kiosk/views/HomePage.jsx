@@ -26,7 +26,7 @@ export default function KioskHomePage() {
         {/* Start kiosk ordering flow */}
         <button
           className="kiosk-start-button"
-          onClick={() => navigate("/kiosk/categories")}
+          onClick={() => navigate("/kiosk/start")}
         >
           <TranslatedText text={'Start Order'}/>
         </button>

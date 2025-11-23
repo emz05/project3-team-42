@@ -16,7 +16,7 @@ import "../css/main.css";
 
 export default function ReviewPage() {
   const navigate = useNavigate();
-  const { cart, clearCart, updateCart } = useCart();
+  const { cart, clearCart, updateCart, customerProfile } = useCart();
 
   // Calculate totals (match cashier exactly)
   const subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -39,6 +39,14 @@ export default function ReviewPage() {
       return;
     }
     navigate("/kiosk/payment");
+  };
+
+  const handleAddMoreItems = () => {
+    if (customerProfile && customerProfile.phone) {
+      navigate("/kiosk/profile/options");
+    } else {
+      navigate("/kiosk/guest");
+    }
   };
 
   // Build customization text (match cashier)
@@ -320,10 +328,10 @@ export default function ReviewPage() {
             }}
           >
             <button
-              className="kiosk-nav"
-              onClick={() => navigate("/kiosk/categories")}
+              className="kiosk-nav-items"
+              onClick={handleAddMoreItems}
             >
-              <TranslatedText text={"Add More Items"} />
+              <TranslatedText text={"Back to Options"} />
             </button>
 
             <button

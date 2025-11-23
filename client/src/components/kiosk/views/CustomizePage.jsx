@@ -162,7 +162,7 @@ export default function CustomizePage() {
       </div>
 
       <div className="kiosk-buttons">
-        <button className="kiosk-nav" onClick={() => navigate(-1)}>
+        <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
           <TranslatedText text={"Back to Items"} />
         </button>
         <button className="kiosk-action-button" onClick={handleAddToCart}>

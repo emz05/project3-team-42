@@ -40,6 +40,13 @@ export default function CategoryPage() {
           </div>
         ))}
       </div>
+
+      <button
+        className="kiosk-nav"
+        onClick={() => navigate("/kiosk/start")}
+      >
+        <TranslatedText text={"Back to Start"} />
+      </button>
     </div>
   );
 }

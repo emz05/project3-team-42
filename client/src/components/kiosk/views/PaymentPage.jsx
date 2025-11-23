@@ -15,9 +15,155 @@ import TranslatedText from '../../common/TranslateText.jsx';
 import currency from 'currency.js';
 import '../css/payment-page.css';
 
+const normalizeIceLevel = (value) => {
+  if (!value) {
+    return '';
+  }
+
+  const map = {
+    Reg: 'Regular Ice',
+    Regular: 'Regular Ice',
+    'Regular Ice': 'Regular Ice',
+    Lt: 'Light Ice',
+    Light: 'Light Ice',
+    'Light Ice': 'Light Ice',
+    No: 'No Ice',
+    None: 'No Ice',
+    'No Ice': 'No Ice',
+    Ext: 'Extra Ice',
+    Extra: 'Extra Ice',
+    'Extra Ice': 'Extra Ice',
+  };
+
+  const trimmed = String(value).trim();
+  if (map[trimmed]) {
+    return map[trimmed];
+  }
+  if (map[trimmed.toUpperCase()]) {
+    return map[trimmed.toUpperCase()];
+  }
+  return trimmed;
+};
+
+const summarizeCartForReceipt = (items = []) => {
+  return items.map((item) => {
+    let drinkName = '';
+    if (item.drinkName) {
+      drinkName = item.drinkName;
+    } else {
+      let drinkId = '';
+      if (item.drinkId) {
+        drinkId = item.drinkId;
+      }
+      drinkName = `Drink #${drinkId}`;
+    }
+
+    let size = '';
+    if (item.size) {
+      size = item.size;
+    }
+
+    let sugar = '';
+    if (item.sweetness) {
+      sugar = item.sweetness;
+    }
+
+    let toppings = [];
+    if (Array.isArray(item.toppingDisplayNames)) {
+      toppings = item.toppingDisplayNames.filter(Boolean);
+    } else if (Array.isArray(item.toppings)) {
+      toppings = item.toppings.filter(Boolean);
+    }
+
+    return {
+      drinkName,
+      size,
+      sugar,
+      ice: normalizeIceLevel(item.iceLevel),
+      toppings,
+    };
+  });
+};
+
+const snapshotCartForStorage = (items = []) => {
+  return items.map((item) => {
+    let drinkName = '';
+    if (item.drinkName) {
+      drinkName = item.drinkName;
+    } else if (item.name) {
+      drinkName = item.name;
+    } else {
+      let drinkId = '';
+      if (item.drinkId) {
+        drinkId = item.drinkId;
+      }
+      drinkName = `Drink #${drinkId}`;
+    }
+
+    let unitPriceValue = 0;
+    if (item.unitPrice) {
+      unitPriceValue = item.unitPrice;
+    } else if (item.totalPrice) {
+      unitPriceValue = item.totalPrice;
+    }
+
+    let quantityValue = 1;
+    if (item.quantity) {
+      quantityValue = item.quantity;
+    }
+
+    let size = '';
+    if (item.size) {
+      size = item.size;
+    } else if (item.selectedSize) {
+      size = item.selectedSize;
+    }
+
+    let iceLevel = '';
+    if (item.iceLevel) {
+      iceLevel = item.iceLevel;
+    }
+
+    let sweetness = '';
+    if (item.sweetness) {
+      sweetness = item.sweetness;
+    }
+
+    let toppings = [];
+    if (Array.isArray(item.toppings)) {
+      toppings = item.toppings.filter(Boolean);
+    }
+
+    let toppingDisplayNames = undefined;
+    if (Array.isArray(item.toppingDisplayNames)) {
+      toppingDisplayNames = item.toppingDisplayNames.filter(Boolean);
+    }
+
+    let totalPriceValue = 0;
+    if (item.totalPrice) {
+      totalPriceValue = item.totalPrice;
+    } else if (item.unitPrice) {
+      totalPriceValue = item.unitPrice;
+    }
+
+    return {
+      drinkId: item.drinkId,
+      drinkName,
+      unitPrice: Number(unitPriceValue),
+      quantity: Number(quantityValue),
+      size,
+      iceLevel,
+      sweetness,
+      toppings,
+      toppingDisplayNames,
+      totalPrice: Number(totalPriceValue),
+    };
+  });
+};
+
 export default function PaymentPage() {
   const navigate = useNavigate();
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, saveLastOrderInfo } = useCart();
   
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -135,6 +281,16 @@ export default function PaymentPage() {
       console.log('Payment response:', data);
 
       if (res.ok && data?.success) {
+        const cartSnapshot = snapshotCartForStorage(cart);
+        const summaryItems = summarizeCartForReceipt(cartSnapshot);
+
+        saveLastOrderInfo({
+          receiptId: data.receiptID,
+          totalAmount: Number(total.toFixed(2)),
+          cart: cartSnapshot,
+          items: summaryItems,
+        });
+
         clearCart();
         navigate('/kiosk/confirmation');
       } else {
@@ -254,9 +410,9 @@ export default function PaymentPage() {
               type="button"
               onClick={() => navigate('/kiosk/review')}
               disabled={loading}
-              className="kiosk-nav"
+              className="kiosk-nav-payment"
             >
-              <TranslatedText text="Back" />
+              <TranslatedText text="Back to Review" />
             </button>
 
             <button
