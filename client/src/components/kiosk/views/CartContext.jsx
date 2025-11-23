@@ -12,6 +12,8 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  const [customerProfile, setCustomerProfile] = useState(null);
+  const [lastOrderInfo, setLastOrderInfo] = useState(null);
 
   // Add item to cart - merge if same customizations exist (match cashier)
   const addToCart = (item) => {
@@ -42,6 +44,18 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCart([]);
+  };
+
+  const clearCustomerProfile = () => {
+    setCustomerProfile(null);
+  };
+  
+  const saveLastOrderInfo = (info) => {
+    setLastOrderInfo(info || null);
+  };
+
+  const clearLastOrderInfo = () => {
+    setLastOrderInfo(null);
   };
 
   const removeItem = (index) => {
@@ -111,6 +125,12 @@ export const CartProvider = ({ children }) => {
         removeItem,
         updateQuantity,
         updateCart,
+        customerProfile,
+        setCustomerProfile,
+        clearCustomerProfile,
+        lastOrderInfo,
+        saveLastOrderInfo,
+        clearLastOrderInfo,
       }}
     >
       {children}

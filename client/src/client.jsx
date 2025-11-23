@@ -6,6 +6,11 @@ import LoginPanel from './components/cashier/views/LoginPanel.jsx';
 import OrderPanel from './components/cashier/views/OrderPanel.jsx';
 import HomePanel from './components/HomePanel.jsx';
 import KioskHomePage from './components/kiosk/views/HomePage.jsx';
+import StartOrderPage from './components/kiosk/views/StartOrderPage.jsx';
+import GuestOptionsPage from './components/kiosk/views/GuestOptionsPage.jsx';
+import ProfileLoginPage from './components/kiosk/views/ProfileLoginPage.jsx';
+import ProfileOptionsPage from './components/kiosk/views/ProfileOptionsPage.jsx';
+import ProfileOrdersPage from './components/kiosk/views/ProfileOrdersPage.jsx';
 import CategoryPage from './components/kiosk/views/CategoryPage.jsx';
 import ItemPage from './components/kiosk/views/ItemPage.jsx';
 import CustomizePage from './components/kiosk/views/CustomizePage.jsx';
@@ -50,6 +55,11 @@ function Client() {
                 <CartProvider>
                   <Routes>
                     <Route path="" element={<KioskHomePage />} />
+                    <Route path="start" element={<StartOrderPage />} />
+                    <Route path="guest" element={<GuestOptionsPage />} />
+                    <Route path="profile/login" element={<ProfileLoginPage />} />
+                    <Route path="profile/options" element={<ProfileOptionsPage />} />
+                    <Route path="profile/orders" element={<ProfileOrdersPage />} />
                     <Route path="categories" element={<CategoryPage />} />
                     <Route path="categories/:categoryId" element={<ItemPage />} />
                     <Route path="item/:itemId/customize" element={<CustomizePage />} />
@@ -96,4 +106,3 @@ function Client() {
 
 
 export default Client;
-

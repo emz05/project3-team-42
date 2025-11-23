@@ -12,19 +12,27 @@ import { employeeAPI } from '../../../services/api.js';
 import '../css/login-panel.css';
 import TranslatedText from "../../common/TranslateText.jsx";
 
-const LoginPanel = () => {
+const LoginPanel = ({
+    maxDigits = 6,
+    titleText = "Enter your employee ID",
+    errorText = "Invalid employee ID",
+    onSubmit,
+    onSuccess,
+}) => {
     const [password, setPassword] = useState('');
     const [error, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
+    const submitHandler = onSubmit || employeeAPI.login;
+
     // Add a digit to the employee ID input
     const addDigit = (digit) => {
-        if (password.length < 6) {
+        if (password.length < maxDigits) {
             const updatePassword = password + digit;
             setPassword(updatePassword);
 
             // Auto-submit once 6 digits are entered
-            if (updatePassword.length === 6) {
+            if (updatePassword.length === maxDigits) {
                 handleLogin(updatePassword);
             }
         }
@@ -43,18 +51,22 @@ const LoginPanel = () => {
         setErrorMessage('');
 
         try {
-            const employee = await employeeAPI.login(employeeID);
-            sessionStorage.setItem('employee', JSON.stringify(employee.data));
-            navigate('/cashier/order');
+            const response = await submitHandler(employeeID);
+            if (onSuccess) {
+                onSuccess(response);
+            } else {
+                sessionStorage.setItem('employee', JSON.stringify(response.data));
+                navigate('/cashier/order');
+            }
         } catch (error) {
-            setErrorMessage('Invalid employee ID');
+            setErrorMessage(errorText);
             setPassword('');
         }
     };
 
     // Builds the 6 password indicator dots
     const createPasswordDots = () => {
-        return Array.from({ length: 6 }).map((_, i) => {
+        return Array.from({ length: maxDigits }).map((_, i) => {
             const filled = i < password.length;
             return <div key={i} className={filled ? 'dot filled' : 'dot'}></div>;
         });
@@ -64,9 +76,9 @@ const LoginPanel = () => {
         <div className="login-container">
             <div className="login-box">
                 <div className="login-header">
-                    <div> ♔ </div>
+                    <div style={{ height: "30px" }}></div>
                     <div className="login-title">
-                        <TranslatedText text={"Enter your employee ID"} />
+                        <TranslatedText text={titleText} />
                     </div>
                 </div>
 
