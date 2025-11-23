@@ -3,6 +3,7 @@ const pool = require('../database');
 const Receipt = require('../models/receipt');
 const { fulfillCartItem } = require('../models/orderFulfillment');
 const PendingOrders = require('../models/pendingOrders');
+const Customers = require('../models/customers');
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -68,13 +69,34 @@ async function finalizePendingOrder(paymentIntent) {
     try {
         await connection.query('BEGIN');
 
-        const receiptId = await Receipt.createReceipt(pendingOrder.employee_id, pendingOrder.total_amount, 'Card', connection);
+        const customerPhone = metadata.customer_phone || null;
+
+        const receiptId = await Receipt.createReceipt(
+            pendingOrder.employee_id,
+            pendingOrder.total_amount,
+            'Card',
+            connection,
+            { customerPhone }
+        );
 
         for (const item of cartItems) { await fulfillCartItem(item, receiptId, connection); }
 
         await PendingOrders.markCompleted(connection, pendingOrder.id, paymentIntent.id, receiptId);
 
         await connection.query('COMMIT');
+
+        if (customerPhone) {
+            try {
+                await Customers.recordOrder({
+                    phoneNumber: customerPhone,
+                    receiptId,
+                    totalAmount: pendingOrder.total_amount,
+                    cart: cartItems,
+                });
+            } catch (err) {
+                console.error('CUSTOMER_RECORD_AFTER_WEBHOOK_FAILED', err);
+            }
+        }
     } catch (error) {
         await connection.query('ROLLBACK');
         console.error('finalize pending order error:', error);

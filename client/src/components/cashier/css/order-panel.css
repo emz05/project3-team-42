@@ -132,11 +132,11 @@ ul {
 }
 
 .drink-image {
-    width: 100px;
+    width: 200px;
     height: 200px;
     border-radius: 8px;
     margin-bottom: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
 }
 
 .drink-name {
@@ -144,7 +144,7 @@ ul {
     font-weight: 600;
     color: #1f2937;
     margin: 8px 0;
-    margin-top: 30px;
+    margin-top: 10px;
     line-height: 1.4;
 }
 
@@ -152,7 +152,8 @@ ul {
     font-size: 13px;
     font-weight: 600;
     color: #6b7280;
-    margin: 4px 0 0 0;
+    margin-top: 4px;
+    margin-bottom: 10px;
 }
 
 /* cart section */
@@ -218,11 +219,10 @@ ul {
 }
 
 .cart-card-image {
-    width: 50px;
+    width: 80px;
     height: 80px;
     border-radius: 8px;
     flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .cart-card-details {
@@ -734,6 +734,11 @@ ul {
 
 .receipt-button:hover {
     background: #0f172a;
+}
+
+.muted{
+    margin-top: 15px;
+    color: lightgreen;
 }
 
 /* utils */
