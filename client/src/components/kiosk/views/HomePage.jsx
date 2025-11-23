@@ -15,17 +15,17 @@ export default function KioskHomePage() {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="kiosk-page">
       {/* Kiosk language selector */}
       <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
 
-      <div className="button-container">
+      <div className="kiosk-welcome-container">
         <h1><TranslatedText text={'Welcome!'}/></h1>
         <p><TranslatedText text={'Tap to begin your order'}/></p>
 
         {/* Start kiosk ordering flow */}
         <button
-          className="kiosk-button"
+          className="kiosk-start-button"
           onClick={() => navigate("/kiosk/categories")}
         >
           <TranslatedText text={'Start Order'}/>

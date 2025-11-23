@@ -1,42 +1,42 @@
 /*
  * CategoryPage.jsx
  * -----------------------
- * - Displays drink categories for the kiosk.
+ * - Fetches drink categories from the kiosk backend.
  * - Users tap a category to navigate to its item list.
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import "../css/main.css";
 
-export default function CategoriesPage() {
+export default function CategoryPage() {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
 
-  // Static list of kiosk categories
-  const categories = [
-    { id: 1, name: "Milk Tea" },
-    { id: 2, name: "Fruit Tea" },
-    { id: 3, name: "Smoothies" },
-    { id: 4, name: "Seasonal Specials" },
-  ];
+  useEffect(() => {
+    fetch("/api/kiosk/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Failed to fetch categories:", err));
+  }, []);
 
   return (
     <div className="kiosk-container">
-      {/* Language selector for kiosk users */}
-      <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
+      <div className="kiosk-language-dropdown"><LanguageDropdown /></div>
 
-      <h2><TranslatedText text={'Select a Category'}/></h2>
+      <h2><TranslatedText text={"Select a Category"} /></h2>
 
-      {/* Grid of category buttons */}
       <div className="kiosk-grid">
-        {categories.map((cat) => (
+        {categories.map((cat, index) => (
           <div
-            key={cat.id}
+            key={index}
             className="kiosk-card"
-            onClick={() => navigate(`/kiosk/categories/${cat.id}`)}
+            onClick={() => navigate(`/kiosk/categories/${encodeURIComponent(cat.name)}`)}
+
           >
-            <h3><TranslatedText text={cat.name}/></h3>
+            <h3><TranslatedText text={cat.name} /></h3>
           </div>
         ))}
       </div>

@@ -77,6 +77,12 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/sms', smsRoutes);
 
+const drinkRoutes = require('./routes/drink');
+app.use('/api/drinks', drinkRoutes);
+
+const kioskRoutes = require("./routes/kiosk");
+app.use("/api/kiosk", kioskRoutes);
+
 
 // Add process hook to shutdown pool
 if(process.env.NODE_ENV === 'production'){
