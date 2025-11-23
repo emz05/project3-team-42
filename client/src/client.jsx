@@ -31,6 +31,7 @@ const ManagerProtectedRoute = ({ children }) => {
   return children;
 };
 
+import { ContrastProvider } from './components/kiosk/views/ContrastContext.jsx';
 import { CartProvider } from "./components/kiosk/views/CartContext.jsx";
 
 function Client() {
@@ -52,22 +53,24 @@ function Client() {
 
               {/* kiosk */}
               <Route path="/kiosk/*" element={
-                <CartProvider>
-                  <Routes>
-                    <Route path="" element={<KioskHomePage />} />
-                    <Route path="start" element={<StartOrderPage />} />
+                <ContrastProvider>
+                  <CartProvider>
+                    <Routes>
+                      <Route path="" element={<KioskHomePage />} />
+                      <Route path="start" element={<StartOrderPage />} />
                     <Route path="guest" element={<GuestOptionsPage />} />
                     <Route path="profile/login" element={<ProfileLoginPage />} />
                     <Route path="profile/options" element={<ProfileOptionsPage />} />
                     <Route path="profile/orders" element={<ProfileOrdersPage />} />
                     <Route path="categories" element={<CategoryPage />} />
-                    <Route path="categories/:categoryId" element={<ItemPage />} />
-                    <Route path="item/:itemId/customize" element={<CustomizePage />} />
-                    <Route path="review" element={<ReviewPage />} />
-                    <Route path="confirmation" element={<ConfirmationPage />} />
-                    <Route path="payment" element={<PaymentPage />} />
-                  </Routes>
-                </CartProvider>
+                      <Route path="categories/:categoryId" element={<ItemPage />} />
+                      <Route path="item/:itemId/customize" element={<CustomizePage />} />
+                      <Route path="review" element={<ReviewPage />} />
+                      <Route path="confirmation" element={<ConfirmationPage />} />
+                      <Route path="payment" element={<PaymentPage />} />
+                    </Routes>
+                  </CartProvider>
+                </ContrastProvider>
               } />
 
                 {/* default home and error pages */}

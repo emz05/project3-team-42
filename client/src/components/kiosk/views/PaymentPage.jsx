@@ -12,8 +12,10 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from './CartContext.jsx';
 import LanguageDropdown from '../../common/LanguageDropdown.jsx';
 import TranslatedText from '../../common/TranslateText.jsx';
+import ContrastToggle from './ContrastToggle.jsx';
 import currency from 'currency.js';
 import '../css/payment-page.css';
+import '../css/contrast-toggle.css';
 
 const normalizeIceLevel = (value) => {
   if (!value) {
@@ -306,6 +308,7 @@ export default function PaymentPage() {
 
   return (
     <div className="payment-page">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>

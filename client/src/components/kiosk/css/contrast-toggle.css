@@ -1,0 +1,211 @@
+/* contrast-toggle.css - Contrast toggle button styles */
+
+.contrast-toggle {
+    position: fixed;
+    top: 20px;
+    left: 30px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background-color: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.contrast-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border-color: #d1d5db;
+}
+
+.contrast-toggle:active {
+    transform: translateY(0);
+}
+
+.contrast-toggle.active {
+    background-color: #1f2937;
+    color: #ffffff;
+    border-color: #1f2937;
+}
+
+.contrast-toggle svg {
+    flex-shrink: 0;
+}
+
+.contrast-toggle-text {
+    white-space: nowrap;
+}
+
+/* High contrast mode styles */
+body.high-contrast {
+    background-color: #000000;
+}
+
+body.high-contrast .kiosk-container,
+body.high-contrast .kiosk-page {
+    background-color: #000000;
+}
+
+body.high-contrast h1,
+body.high-contrast h2,
+body.high-contrast h3,
+body.high-contrast p,
+body.high-contrast span {
+    color: #ffffff !important;
+}
+
+body.high-contrast .kiosk-card {
+    background-color: #1f2937;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-card:hover {
+    background-color: #374151;
+    border-color: #fbbf24;
+}
+
+body.high-contrast .kiosk-start-button,
+body.high-contrast .kiosk-action-button {
+    background-color: #fbbf24;
+    color: #000000;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-start-button:hover,
+body.high-contrast .kiosk-action-button:hover {
+    background-color: #f59e0b;
+    border-color: #fbbf24;
+}
+
+body.high-contrast .kiosk-nav {
+    background-color: #374151;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .kiosk-nav:hover {
+    background-color: #4b5563;
+    border-color: #fbbf24;
+}
+
+body.high-contrast .option-btn {
+    background-color: #1f2937;
+    color: #ffffff;
+    border: 2px solid #6b7280;
+}
+
+body.high-contrast .option-btn:hover {
+    background-color: #374151;
+    border-color: #ffffff;
+}
+
+body.high-contrast .option-btn.selected {
+    background-color: #fbbf24;
+    color: #000000;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-summary {
+    background-color: #1f2937;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-summary > div {
+    border-color: #6b7280;
+}
+
+body.high-contrast .kiosk-cart {
+    background-color: #1f2937;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .cart-card {
+    background-color: #374151;
+    border: 2px solid #6b7280;
+}
+
+body.high-contrast .quantity-btn.increase-btn {
+    background-color: #10b981;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .quantity-btn.decrease-btn {
+    background-color: #ef4444;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .order-summary,
+body.high-contrast .payment-form {
+    background-color: #1f2937;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .form-input {
+    background-color: #374151;
+    color: #ffffff;
+    border: 2px solid #6b7280;
+}
+
+body.high-contrast .form-input:focus {
+    border-color: #fbbf24;
+    background-color: #4b5563;
+}
+
+body.high-contrast .form-label {
+    color: #ffffff;
+}
+
+body.high-contrast .pay-button {
+    background-color: #10b981;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .pay-button:hover {
+    background-color: #059669;
+}
+
+body.high-contrast .error-message {
+    background-color: #7f1d1d;
+    color: #ffffff;
+    border: 2px solid #ef4444;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* Ensure images remain visible */
+body.high-contrast .kiosk-drink-image,
+body.high-contrast .cart-card-image {
+    opacity: 0.9;
+    border: 2px solid #ffffff;
+}
+
+/* Language dropdown in high contrast */
+body.high-contrast .kiosk-language-dropdown button,
+body.high-contrast .kiosk-language-dropdown select {
+    background-color: #1f2937;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contrast-toggle {
+        top: 10px;
+        left: 10px;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .contrast-toggle-text {
+        display: none;
+    }
+}

@@ -9,9 +9,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import { useCart } from "./CartContext.jsx";
 import { customerAPI, notificationAPI } from "../../../services/api.js";
 import "../css/main.css";
+import "../css/contrast-toggle.css";
 
 function normalizePhoneInput(value) {
   if (!value) {
@@ -141,7 +143,12 @@ export default function ConfirmationPage() {
 
   return (
     <div className="kiosk-container">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown"><LanguageDropdown /></div>
+      
+      <h1><TranslatedText text={"Thank you!"} /></h1>
+      <p><TranslatedText text={"Your order has been placed."} /></p>
+      <p><TranslatedText text={"Please wait for your number to be called."} /></p>
       <h1>
         <TranslatedText
           text={
