@@ -78,9 +78,9 @@ function buildMessage(orderNumber, items) {
   const itemList = items.map(formatLineItem).join('\n');
 
   return [
-    `Order ${orderNumber} is placed!`,
+    `\nOrder ${orderNumber} placed\n`,
     itemList,
-    'Please head to the counter and wait for your number to be called.'
+    'Please listen for your number to get drink!\n\n We appreciate your visit and want to introduce you to some other cool features we have\n\nReply HELP to see our other offerings'
   ].join('\n');
 }
 

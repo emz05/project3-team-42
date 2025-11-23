@@ -10,7 +10,7 @@ import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import { useTranslation } from '../../../context/translation-storage.jsx';
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
-import { drinkAPI, orderAPI, pendingOrderAPI, notificationAPI } from "../../../services/api.js";
+import { drinkAPI, orderAPI, pendingOrderAPI, notificationAPI, customerAPI } from "../../../services/api.js";
 import '../css/order-panel.css'
 
 // Remove all non-digit characters from phone input
@@ -21,31 +21,36 @@ function normalizePhoneInput(value) {
     return value.replace(/\D/g, '');
 }
 
-// Format cart items into the structure needed for SMS
-function formatCartItemsForSms(items) {
+function cloneCartForStorage(items) {
+    if (!items) {
+        return [];
+    }
+
+    return items.map((item) => ({
+        drinkId: item.drinkId,
+        drinkName: item.drinkName || item.name || `Drink #${item.drinkId}`,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        size: item.size || item.selectedSize || '',
+        iceLevel: item.iceLevel || '',
+        sweetness: item.sweetness || '',
+        toppings: Array.isArray(item.toppings) ? item.toppings.filter(Boolean) : [],
+        totalPrice: item.totalPrice,
+    }));
+}
+
+function summarizeCartForSms(items) {
     if (!items) {
         items = [];
     }
 
-    return items.map((item) => {
-        const drinkName = item.drinkName || item.name || `Drink #${item.drinkId}`;
-        const size = item.size || item.selectedSize || '';
-        const sugar = item.sweetness || '';
-        const ice = item.iceLevel || '';
-
-        let toppings = [];
-        if (Array.isArray(item.toppings)) {
-            toppings = item.toppings.filter(Boolean);
-        }
-
-        return {
-            drinkName: drinkName,
-            size: size,
-            sugar: sugar,
-            ice: ice,
-            toppings: toppings
-        };
-    });
+    return items.map((item) => ({
+        drinkName: item.drinkName || `Drink #${item.drinkId}`,
+        size: item.size || '',
+        sugar: item.sweetness || '',
+        ice: item.iceLevel || '',
+        toppings: Array.isArray(item.toppings) ? item.toppings.filter(Boolean) : [],
+    }));
 }
 
 const OrderPanel = () => {
@@ -70,6 +75,7 @@ const OrderPanel = () => {
     const [pendingCartSnapshot, setPendingCartSnapshot] = useState([]);
     const [lastCartSnapshot, setLastCartSnapshot] = useState([]);
     const [lastOrderNumber, setLastOrderNumber] = useState(null);
+    const [lastReceiptId, setLastReceiptId] = useState(null);
 
 
 
@@ -238,10 +244,11 @@ const OrderPanel = () => {
 
     const handlePendingOrderPaid = async (receiptId) => {
         const paidTotal = pendingTotal || total;
-        let smsItems = formatCartItemsForSms(cartItems);
+        let cartForStorage = cloneCartForStorage(cartItems);
         if (pendingCartSnapshot.length > 0) {
-            smsItems = pendingCartSnapshot;
+            cartForStorage = pendingCartSnapshot;
         }
+        const smsItems = summarizeCartForSms(cartForStorage);
         const orderId = orderNumber;
         setPaymentSession(null);
         setPendingOrderId(null);
@@ -252,7 +259,8 @@ const OrderPanel = () => {
         setShowPaymentConfirmation(true);
         setOrderNumber(orderNumber + 1);
         setLastOrderNumber(orderId);
-        setLastCartSnapshot(smsItems);
+        setLastReceiptId(receiptId || null);
+        setLastCartSnapshot(cartForStorage);
         setCartItems([]);
         setPointsInput('');
         setAppliedPoints(0);
@@ -278,8 +286,8 @@ const OrderPanel = () => {
                     cartCards: cartItems,
                     totalAmount: total,
                 });
-                const smsItems = formatCartItemsForSms(cartItems);
-                setPendingCartSnapshot(smsItems);
+                const storedCart = cloneCartForStorage(cartItems);
+                setPendingCartSnapshot(storedCart);
                 setPendingTotal(total);
                 setPendingOrderId(data.pendingOrderId);
                 setPaymentSession({
@@ -294,7 +302,7 @@ const OrderPanel = () => {
             setPaymentSession(null);
             setPendingOrderId(null);
             setPendingTotal(0);
-            setPendingCartSnapshot(formatCartItemsForSms(cartItems));
+            setPendingCartSnapshot(cloneCartForStorage(cartItems));
             setShowCashPanel(true);
         }
     };
@@ -380,14 +388,17 @@ const OrderPanel = () => {
             const sendOrder = await orderAPI.processOrder(orderData);
 
             if(sendOrder.data.success){
-                const smsItems = formatCartItemsForSms(cartItems);
+                const storedCart = cloneCartForStorage(cartItems);
+                const smsItems = summarizeCartForSms(storedCart);
                 const currentOrderId = orderNumber;
+                const receiptId = sendOrder.data.receiptID || null;
                 setFinalTotal(total);
                 setShowPaymentConfirmation(true);
-                setConfirmationReceiptId(sendOrder.data.receiptID || null);
+                setConfirmationReceiptId(receiptId);
                 setOrderNumber(orderNumber + 1);
                 setLastOrderNumber(currentOrderId);
-                setLastCartSnapshot(smsItems);
+                setLastReceiptId(receiptId);
+                setLastCartSnapshot(storedCart);
                 setCartItems([]);
                 setPointsInput('');
                 setAppliedPoints(0);
@@ -415,16 +426,25 @@ const OrderPanel = () => {
 
         const snapshot = lastCartSnapshot.length > 0
             ? lastCartSnapshot
-            : formatCartItemsForSms(cartItems);
+            : cloneCartForStorage(cartItems);
 
-        if (!lastOrderNumber || snapshot.length === 0) {
+        const receiptId = confirmationReceiptId || lastReceiptId;
+
+        if (!lastOrderNumber || snapshot.length === 0 || !receiptId) {
             throw new Error('NO_ORDER_READY');
         }
+
+        await customerAPI.recordOrder({
+            phoneNumber: phoneDigits,
+            receiptId,
+            totalAmount: finalTotal,
+            cart: snapshot,
+        });
 
         await notificationAPI.sendOrderConfirmation({
             phoneNumber: phoneDigits,
             orderNumber: lastOrderNumber,
-            items: snapshot
+            items: summarizeCartForSms(snapshot)
         });
     };
 

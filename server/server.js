@@ -21,6 +21,8 @@ const pool = require('./database');
 const pendingOrdersRoutes = require('./routes/pendingOrders');
 const { webhookHandler } = require('./routes/payments');
 const notificationRoutes = require('./routes/notifications');
+const customerRoutes = require('./routes/customers');
+const smsRoutes = require('./routes/sms');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -72,6 +74,8 @@ app.use('/api/translate', translation);
 
 app.use('/api/pending-orders', pendingOrdersRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/sms', smsRoutes);
 
 
 // Add process hook to shutdown pool
@@ -100,7 +104,7 @@ app.get('/health', async (req, res) => {
     res.status(500).json({ status: 'db_error', error: e.message });
   }
 });
-
+console.log('OPENAI key snippet:', process.env.OPENAI_API_KEY?.slice(0, 12));
 
 app.listen(port, () =>{
     console.log(`Server running in ${process.env.NODE_ENV} mode at http://localhost:${port}`);

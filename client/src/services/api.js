@@ -88,6 +88,14 @@ export const pendingOrderAPI = {
 };
 
 /* ===========================
+ * CUSTOMER ORDERS
+ * =========================== */
+export const customerAPI = {
+  recordOrder: (payload) => api.post('/customers/orders', payload),
+  recentOrders: (phone, params) => api.get(`/customers/${phone}/orders`, { params }),
+};
+
+/* ===========================
  * NOTIFICATIONS
  * =========================== */
 export const notificationAPI = {
@@ -105,5 +113,6 @@ export default {
   managerAPI,
   translationAPI,
   pendingOrderAPI,
+  customerAPI,
   notificationAPI,
 };

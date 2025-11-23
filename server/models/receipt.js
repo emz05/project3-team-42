@@ -38,19 +38,20 @@ const buildDailyReport = async (date, connection = pool) => {
 
 const Receipt = {
     // creates a new receipt and returns id of inserted row
-    createReceipt: async (employeeId, totalAmount, paymentMethod, client = null) => {
+    createReceipt: async (employeeId, totalAmount, paymentMethod, client = null, options = {}) => {
         const now = new Date();
         const transactionDate = now.toISOString().slice(0, 10);
         const transactionTime = now.toISOString().slice(11, 19);
+        const customerPhone = options.customerPhone || null;
 
         // query can be dependent on multiple other queries in controller (ie. processing transaction: must all succeed or fail together)
         // default to pool.query() when router only uses one query
         const db = client || pool;
 
         const res = await db.query(
-            `INSERT INTO receipt (employee_id, amount, payment_method, transaction_date, transaction_time) 
-             VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-            [employeeId, totalAmount, paymentMethod, transactionDate, transactionTime]
+            `INSERT INTO receipt (employee_id, amount, payment_method, transaction_date, transaction_time, customer_phone) 
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+            [employeeId, totalAmount, paymentMethod, transactionDate, transactionTime, customerPhone]
         );
         return res.rows[0].id;
     },
@@ -170,6 +171,28 @@ const Receipt = {
         const latest = res.rows[0]?.latest_date;
         if (!latest) return null;
         return buildDailyReport(latest, connection);
+    },
+
+    updateCustomerPhone: async (receiptId, phoneNumber, client = null) => {
+        const db = client || pool;
+        await db.query(
+            `UPDATE receipt SET customer_phone = $1 WHERE id = $2`,
+            [phoneNumber, receiptId]
+        );
+    },
+
+    findLatestByPhone: async (phoneNumber, client = null) => {
+        if (!phoneNumber) return null;
+        const db = client || pool;
+        const { rows } = await db.query(
+            `SELECT *
+             FROM receipt
+             WHERE customer_phone = $1
+             ORDER BY id DESC
+             LIMIT 1`,
+            [phoneNumber]
+        );
+        return rows[0] || null;
     },
 };
 
