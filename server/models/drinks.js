@@ -38,6 +38,8 @@ const Drink = {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
+            // Delete ingredients first
+            await client.query('DELETE FROM drinkingredient WHERE drink_id = $1', [id]);
             await client.query('DELETE FROM orders WHERE drink_id = $1', [id]);
             await client.query('DELETE FROM Drink WHERE id = $1', [id]);
             await client.query('COMMIT');

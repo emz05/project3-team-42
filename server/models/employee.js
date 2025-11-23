@@ -15,7 +15,7 @@ const Employee = {
 // list all employees (for manager view)
 async function listEmployees(connection = pool) {
   const { rows } = await connection.query(
-    'SELECT id, first_name, last_name, role FROM Employee ORDER BY id ASC'
+    'SELECT id, password, first_name, last_name, role, phone_number FROM Employee ORDER BY id ASC'
   );
   return rows;
 }

@@ -2,18 +2,20 @@ const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 
+// Load env files FIRST, before requiring database
 // Load env files with absolute paths so running from repo root works.
 if (process.env.NODE_ENV !== 'production') {
     const devEnvPath = path.join(__dirname, '.env.development');
     dotenv.config({ path: devEnvPath });
 } else {
-    // In production, try loading server/.env.production only if variables aren’t already provided
+    // In production, try loading server/.env.production only if variables aren't already provided
     if (!process.env.PSQL_HOST) {
         const prodEnvPath = path.join(__dirname, '.env.production');
         dotenv.config({ path: prodEnvPath });
     }
 }
 
+// NOW require database after env vars are loaded
 const cors = require('cors');
 const pool = require('./database');
 const pendingOrdersRoutes = require('./routes/pendingOrders');
@@ -24,7 +26,9 @@ const port = process.env.PORT || 8080;
 
 // allow frontend requests access to backend
 const corsOptions = {
-    origin: process.env.CLIENT_URL,
+    origin: process.env.NODE_ENV === 'production' 
+        ? process.env.CLIENT_URL 
+        : true, // Allow all origins in development
     credentials: true
 };
 app.use(cors(corsOptions));
