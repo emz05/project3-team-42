@@ -9,12 +9,30 @@ import React, { useState } from 'react';
 import TranslatedText from "../../common/TranslateText.jsx";
 import '../css/order-panel.css';
 
-const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
+const PaymentConfirmation = ({ orderNumber, total, onSendSms, onClose }) => {
     const [currentDate] = useState(new Date());          // timestamp for receipt
-    const [phoneNumber, setPhoneNumber] = useState('');  // optional phone input
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [statusMessage, setStatusMessage] = useState('');
+    const [sending, setSending] = useState(false);
 
-    const handlePrintReceipt = () => {
-        window.print();
+    const handleSend = async () => {
+        setStatusMessage('');
+        const digits = (phoneNumber || '').replace(/\D/g, '');
+        if (digits.length !== 10) {
+            setStatusMessage('Enter a valid 10-digit number.');
+            return;
+        }
+
+        try {
+            setSending(true);
+            await onSendSms(digits);
+            setStatusMessage('sent');
+            setPhoneNumber('');
+        } catch (error) {
+            setStatusMessage('Unable to send text right now.');
+        } finally {
+            setSending(false);
+        }
     };
 
     return (
@@ -39,7 +57,7 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
 
                     <div className="detail-row">
                         <span className="detail-label"><TranslatedText text="Order ID:" /></span>
-                        <span className="detail-value">#{orderNumber}</span>
+                        <span className="detail-value">#{orderNumber || '—'}</span>
                     </div>
                     <div className="detail-divider" />
 
@@ -61,7 +79,6 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
                     </div>
                 </div>
 
-                {/* Phone + receipt print */}
                 <div className="receipt-input-group">
                     <input
                         type="tel"
@@ -69,11 +86,19 @@ const PaymentConfirmation = ({ orderNumber, total, onClose }) => {
                         placeholder="Enter phone number"
                         value={phoneNumber}
                         onChange={(event) => setPhoneNumber(event.target.value)}
+                        disabled={sending}
                     />
-                    <button className="receipt-button" onClick={handlePrintReceipt}>
-                        <TranslatedText text="Print Receipt" />
+                    <button
+                        className="receipt-button"
+                        onClick={handleSend}
+                        disabled={sending}
+                    >
+                        <TranslatedText text={sending ? 'Sending…' : 'Text Receipt'} />
                     </button>
                 </div>
+                {statusMessage && (
+                    <p className="muted">{statusMessage}</p>
+                )}
             </div>
         </div>
     );

@@ -88,6 +88,14 @@ export const pendingOrderAPI = {
 };
 
 /* ===========================
+ * NOTIFICATIONS
+ * =========================== */
+export const notificationAPI = {
+  sendOrderConfirmation: (payload) =>
+    api.post('/notifications/order-confirmation', payload),
+};
+
+/* ===========================
  * DEFAULT EXPORT
  * =========================== */
 export default {
@@ -97,4 +105,5 @@ export default {
   managerAPI,
   translationAPI,
   pendingOrderAPI,
+  notificationAPI,
 };

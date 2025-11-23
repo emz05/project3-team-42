@@ -10,8 +10,43 @@ import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import { useTranslation } from '../../../context/translation-storage.jsx';
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
-import { drinkAPI, orderAPI, pendingOrderAPI } from "../../../services/api.js";
+import { drinkAPI, orderAPI, pendingOrderAPI, notificationAPI } from "../../../services/api.js";
 import '../css/order-panel.css'
+
+// Remove all non-digit characters from phone input
+function normalizePhoneInput(value) {
+    if (!value) {
+        return '';
+    }
+    return value.replace(/\D/g, '');
+}
+
+// Format cart items into the structure needed for SMS
+function formatCartItemsForSms(items) {
+    if (!items) {
+        items = [];
+    }
+
+    return items.map((item) => {
+        const drinkName = item.drinkName || item.name || `Drink #${item.drinkId}`;
+        const size = item.size || item.selectedSize || '';
+        const sugar = item.sweetness || '';
+        const ice = item.iceLevel || '';
+
+        let toppings = [];
+        if (Array.isArray(item.toppings)) {
+            toppings = item.toppings.filter(Boolean);
+        }
+
+        return {
+            drinkName: drinkName,
+            size: size,
+            sugar: sugar,
+            ice: ice,
+            toppings: toppings
+        };
+    });
+}
 
 const OrderPanel = () => {
     const [employee, setEmployee] = useState(null);
@@ -32,6 +67,9 @@ const OrderPanel = () => {
     const [pendingOrderId, setPendingOrderId] = useState(null);
     const [pendingTotal, setPendingTotal] = useState(0);
     const [confirmationReceiptId, setConfirmationReceiptId] = useState(null);
+    const [pendingCartSnapshot, setPendingCartSnapshot] = useState([]);
+    const [lastCartSnapshot, setLastCartSnapshot] = useState([]);
+    const [lastOrderNumber, setLastOrderNumber] = useState(null);
 
 
 
@@ -82,7 +120,7 @@ const OrderPanel = () => {
                 }
 
                 if (data.status === 'paid') {
-                    handlePendingOrderPaid(data.receiptId);
+                    await handlePendingOrderPaid(data.receiptId);
                     return;
                 }
 
@@ -106,6 +144,10 @@ const OrderPanel = () => {
     const handleLogout = () => {
         sessionStorage.removeItem('employee');
         navigate('/home');
+    };
+
+    const handleCloseConfirmation = () => {
+        setShowPaymentConfirmation(false);
     };
 
     if (!employee) { return <p></p>; }
@@ -194,8 +236,13 @@ const OrderPanel = () => {
         alert(await translate(`Applied ${discount} discount`));
     };
 
-    const handlePendingOrderPaid = (receiptId) => {
+    const handlePendingOrderPaid = async (receiptId) => {
         const paidTotal = pendingTotal || total;
+        let smsItems = formatCartItemsForSms(cartItems);
+        if (pendingCartSnapshot.length > 0) {
+            smsItems = pendingCartSnapshot;
+        }
+        const orderId = orderNumber;
         setPaymentSession(null);
         setPendingOrderId(null);
         setPaymentMethod('');
@@ -204,11 +251,14 @@ const OrderPanel = () => {
         setFinalTotal(paidTotal);
         setShowPaymentConfirmation(true);
         setOrderNumber(orderNumber + 1);
+        setLastOrderNumber(orderId);
+        setLastCartSnapshot(smsItems);
         setCartItems([]);
         setPointsInput('');
         setAppliedPoints(0);
         setCashReceived('');
         setChangeDue(null);
+        setPendingCartSnapshot([]);
         fetchOrderNumber();
     };
 
@@ -228,6 +278,8 @@ const OrderPanel = () => {
                     cartCards: cartItems,
                     totalAmount: total,
                 });
+                const smsItems = formatCartItemsForSms(cartItems);
+                setPendingCartSnapshot(smsItems);
                 setPendingTotal(total);
                 setPendingOrderId(data.pendingOrderId);
                 setPaymentSession({
@@ -242,6 +294,7 @@ const OrderPanel = () => {
             setPaymentSession(null);
             setPendingOrderId(null);
             setPendingTotal(0);
+            setPendingCartSnapshot(formatCartItemsForSms(cartItems));
             setShowCashPanel(true);
         }
     };
@@ -327,16 +380,23 @@ const OrderPanel = () => {
             const sendOrder = await orderAPI.processOrder(orderData);
 
             if(sendOrder.data.success){
+                const smsItems = formatCartItemsForSms(cartItems);
+                const currentOrderId = orderNumber;
                 setFinalTotal(total);
                 setShowPaymentConfirmation(true);
                 setConfirmationReceiptId(sendOrder.data.receiptID || null);
                 setOrderNumber(orderNumber + 1);
+                setLastOrderNumber(currentOrderId);
+                setLastCartSnapshot(smsItems);
                 setCartItems([]);
                 setPointsInput('');
                 setAppliedPoints(0);
                 setPaymentMethod('');
                 setPendingOrderId(null);
                 setPendingTotal(0);
+                setPendingCartSnapshot([]);
+                setCashReceived('');
+                setChangeDue(null);
             }
         } catch(e){
             console.error('Error processing order: ', e);
@@ -346,6 +406,27 @@ const OrderPanel = () => {
     const formattedSubtotal = currency(subtotal).format();
     const formattedTax = currency(tax).format();
     const formattedTotal = currency(total).format();
+
+    const handleSendReceiptSms = async (digits) => {
+        const phoneDigits = normalizePhoneInput(digits);
+        if (phoneDigits.length !== 10) {
+            throw new Error('INVALID_PHONE');
+        }
+
+        const snapshot = lastCartSnapshot.length > 0
+            ? lastCartSnapshot
+            : formatCartItemsForSms(cartItems);
+
+        if (!lastOrderNumber || snapshot.length === 0) {
+            throw new Error('NO_ORDER_READY');
+        }
+
+        await notificationAPI.sendOrderConfirmation({
+            phoneNumber: phoneDigits,
+            orderNumber: lastOrderNumber,
+            items: snapshot
+        });
+    };
 
     return (
         <div className="order-panel">
@@ -494,9 +575,10 @@ const OrderPanel = () => {
 
             {showPaymentConfirmation && (
                 <PaymentConfirmation
-                    orderNumber={orderNumber - 1}
+                    orderNumber={lastOrderNumber}
                     total={finalTotal}
-                    onClose={() => setShowPaymentConfirmation(false)}
+                    onSendSms={handleSendReceiptSms}
+                    onClose={handleCloseConfirmation}
                 />
             )}
         </div>

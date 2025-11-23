@@ -20,6 +20,7 @@ const cors = require('cors');
 const pool = require('./database');
 const pendingOrdersRoutes = require('./routes/pendingOrders');
 const { webhookHandler } = require('./routes/payments');
+const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -70,6 +71,7 @@ const translation = require('./routes/translation');
 app.use('/api/translate', translation);
 
 app.use('/api/pending-orders', pendingOrdersRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 
 // Add process hook to shutdown pool
