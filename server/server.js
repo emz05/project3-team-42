@@ -71,6 +71,12 @@ app.use('/api/translate', translation);
 
 app.use('/api/pending-orders', pendingOrdersRoutes);
 
+const drinkRoutes = require('./routes/drink');
+app.use('/api/drinks', drinkRoutes);
+
+const kioskRoutes = require("./routes/kiosk");
+app.use("/api/kiosk", kioskRoutes);
+
 
 // Add process hook to shutdown pool
 if(process.env.NODE_ENV === 'production'){

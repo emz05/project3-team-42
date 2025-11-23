@@ -1,0 +1,245 @@
+/* main.css - General kiosk page styles */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background-color: #f5f5f7;
+}
+
+.kiosk-container {
+    min-height: 100vh;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.kiosk-language-dropdown {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    z-index: 100;
+}
+
+.kiosk-container h1,
+.kiosk-container h2 {
+    text-align: center;
+    color: #1f2937;
+    margin: 0 0 40px 0;
+}
+
+.kiosk-container h1 {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.kiosk-container h2 {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.kiosk-container p {
+    text-align: center;
+    font-size: 20px;
+    color: #6b7280;
+    margin: 10px 0;
+}
+
+/* Grid layout for categories and items */
+.kiosk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin: 0 auto;
+    max-width: 1400px;
+    width: 100%;
+}
+
+/* Cards for categories and drinks */
+.kiosk-card {
+    background-color: #ffffff;
+    border: 1px solid #f3f4f6;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.kiosk-card:hover {
+    border-color: #e5e7eb;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px) scale(1.02);
+}
+
+.kiosk-card:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+.kiosk-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.kiosk-card p {
+    font-size: 20px;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 12px 0 0 0;
+}
+
+/* Drink images */
+.kiosk-drink-image {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Navigation buttons */
+.kiosk-nav {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 16px 40px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 40px auto 0;
+    display: block;
+}
+
+.kiosk-nav:hover {
+    background-color: #e5e7eb;
+    color: #1f2937;
+    transform: translateY(-2px);
+}
+
+.kiosk-nav:active {
+    background-color: #d1d5db;
+    transform: translateY(0);
+}
+
+/* Action buttons - renamed to avoid conflict with homepanel.css */
+.kiosk-action-button {
+    background-color: #5a67d8;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 18px 50px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(90, 103, 216, 0.3);
+    margin: 10px;
+}
+
+.kiosk-action-button:hover {
+    background-color: #4c56c7;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(90, 103, 216, 0.4);
+}
+
+.kiosk-action-button:active {
+    transform: translateY(-1px);
+    background-color: #4149b8;
+}
+
+.kiosk-action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #9ca3af;
+}
+
+/* Summary/Review sections */
+.kiosk-summary {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px auto;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.kiosk-summary div {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.kiosk-summary div:last-child {
+    border-bottom: none;
+}
+
+.kiosk-summary p {
+    text-align: left;
+    font-size: 16px;
+    color: #1f2937;
+    margin: 8px 0;
+}
+
+.kiosk-summary strong {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* Cart display */
+.kiosk-cart {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+}
+
+.kiosk-cart-empty {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    padding: 20px;
+}
+
+.kiosk-cart::-webkit-scrollbar {
+    width: 6px;
+}
+
+.kiosk-cart::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kiosk-cart::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+}
+
+.kiosk-cart::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+button:focus,
+input:focus {
+    outline: none;
+}

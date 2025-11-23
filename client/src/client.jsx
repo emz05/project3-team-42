@@ -11,6 +11,7 @@ import ItemPage from './components/kiosk/views/ItemPage.jsx';
 import CustomizePage from './components/kiosk/views/CustomizePage.jsx';
 import ReviewPage from './components/kiosk/views/ReviewPage.jsx';
 import ConfirmationPage from './components/kiosk/views/ConfirmationPage.jsx';
+import PaymentPage from './components/kiosk/views/PaymentPage.jsx';
 
 import ManagerLogin from './components/manager/ManagerLogin.jsx';
 import ManagerPanel from './components/manager/ManagerPanel.jsx';
@@ -24,6 +25,8 @@ const ManagerProtectedRoute = ({ children }) => {
   }
   return children;
 };
+
+import { CartProvider } from "./components/kiosk/views/CartContext.jsx";
 
 function Client() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
@@ -42,13 +45,20 @@ function Client() {
                 <Route path="/cashier/login" element={<LoginPanel />} />
                 <Route path="/cashier/order" element={<OrderPanel />} />
 
-                {/* kiosk */}
-                <Route path="/kiosk" element={<KioskHomePage />} />
-                <Route path="/kiosk/categories" element={<CategoryPage />} />
-                <Route path="/kiosk/categories/:categoryId" element={<ItemPage />} />
-                <Route path="/kiosk/item/:itemId/customize" element={<CustomizePage />} />
-                <Route path="/kiosk/review" element={<ReviewPage />} />
-                <Route path="/kiosk/confirmation" element={<ConfirmationPage />} />
+              {/* kiosk */}
+              <Route path="/kiosk/*" element={
+                <CartProvider>
+                  <Routes>
+                    <Route path="" element={<KioskHomePage />} />
+                    <Route path="categories" element={<CategoryPage />} />
+                    <Route path="categories/:categoryId" element={<ItemPage />} />
+                    <Route path="item/:itemId/customize" element={<CustomizePage />} />
+                    <Route path="review" element={<ReviewPage />} />
+                    <Route path="confirmation" element={<ConfirmationPage />} />
+                    <Route path="payment" element={<PaymentPage />} />
+                  </Routes>
+                </CartProvider>
+              } />
 
                 {/* default home and error pages */}
                 <Route path="/home" element={<HomePanel />} />

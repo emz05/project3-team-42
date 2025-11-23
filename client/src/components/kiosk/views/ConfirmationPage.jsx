@@ -9,22 +9,20 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import "../css/main.css";
 
 export default function ConfirmationPage() {
   const navigate = useNavigate();
 
   return (
     <div className="kiosk-container">
-      {/* Language selector for kiosk users */}
-      <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
+      <div className="kiosk-language-dropdown"><LanguageDropdown /></div>
+      <h1><TranslatedText text={"Thank you!"} /></h1>
+      <p><TranslatedText text={"Your order has been placed."} /></p>
+      <p><TranslatedText text={"Please wait for your number to be called."} /></p>
 
-      <h1><TranslatedText text={'Thank you!'}/></h1>
-      <p><TranslatedText text={'Your order has been placed.'}/></p>
-      <p><TranslatedText text={'Please wait for your number to be called.'}/></p>
-
-      {/* Return to kiosk home to start a new order */}
-      <button className="kiosk-button" onClick={() => navigate("/kiosk")}>
-        <TranslatedText text={'New Order'}/>
+      <button className="kiosk-action-button" onClick={() => navigate("/kiosk")}>
+        <TranslatedText text={"New Order"} />
       </button>
     </div>
   );
