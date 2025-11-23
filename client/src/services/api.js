@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+// Use Vite proxy in development, or explicit URL if provided
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // axios instance for making API requests
 const api = axios.create({
@@ -10,17 +11,13 @@ const api = axios.create({
   },
 });
 
-/* ===========================
- * CASHIER / EMPLOYEE
- * =========================== */
+ /* CASHIER / EMPLOYEE */
 export const employeeAPI = {
   // login employee with given password
   login: (password) => api.post('/cashier/login', { password }),
 };
 
-/* ===========================
- * DRINKS (Cashier/Kiosk)
- * =========================== */
+/* DRINKS (Cashier/Kiosk) */
 export const drinkAPI = {
   getDrinks: () => api.get('/cashier/drinks'),
   getDrinksByCategory: (category) => api.get(`/cashier/drinks/${category}`),
@@ -43,6 +40,12 @@ export const managerAPI = {
   addDrink: (payload) => api.post('/manager/drinks', payload),
   updateDrink: (id, payload) => api.put(`/manager/drinks/${id}`, payload),
   deleteDrink: (id) => api.delete(`/manager/drinks/${id}`),
+  
+  /* ----- DRINK INGREDIENTS ----- */
+  getDrinkIngredients: (drinkId) => api.get(`/manager/drinks/${drinkId}/ingredients`),
+  addDrinkIngredient: (drinkId, payload) => api.post(`/manager/drinks/${drinkId}/ingredients`, payload),
+  updateDrinkIngredient: (ingredientId, payload) => api.put(`/manager/drinks/ingredients/${ingredientId}`, payload),
+  deleteDrinkIngredient: (ingredientId) => api.delete(`/manager/drinks/ingredients/${ingredientId}`),
 
   /* ----- DASHBOARD ANALYTICS ----- */
   dashboard: () => api.get('/manager/dashboard'),
@@ -57,12 +60,15 @@ export const managerAPI = {
   listEmployees: () => api.get('/manager/employees'),
   addEmployee: (payload) => api.post('/manager/employees', payload),
   updateEmployee: (id, payload) => api.put(`/manager/employees/${id}`, payload),
+  deleteEmployee: (id) => api.delete(`/manager/employees/${id}`),
 
   /* ----- INVENTORY MANAGEMENT ----- */
   listInventory: () => api.get('/manager/inventory'),
   addInventoryItem: (payload) => api.post('/manager/inventory', payload),
   updateInventoryItem: (id, payload) =>
     api.put(`/manager/inventory/${id}`, payload),
+  deleteInventoryItem: (id) => api.delete(`/manager/inventory/${id}`),
+  restockInventoryItem: (id) => api.post(`/manager/inventory/${id}/restock`),
 };
 
 /* ===========================

@@ -1,4 +1,3 @@
-// Establish Database Connection
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -6,7 +5,7 @@ const pool = new Pool({
     host: process.env.PSQL_HOST,
     database: process.env.PSQL_DATABASE,
     password: process.env.PSQL_PASSWORD,
-    port: process.env.PSQL_PORT,
+    port: parseInt(process.env.PSQL_PORT, 10) || 5432,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 

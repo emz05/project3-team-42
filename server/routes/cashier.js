@@ -24,13 +24,11 @@ const validateRequest = (body) => {
     return { valid: true };
 };
 
-// test http://localhost:8080/api/cashier <- append other get paths to test backend
 router.get('/', (req, res) => {
     res.json({ message: 'working Cashier API' });
 });
 
 
-// handles login requests from frontend, sends back employee data if password exists in DB
 router.post('/login', async (req, res) => {
     try{
         const { password } = req.body;

@@ -74,7 +74,7 @@ async function list({ lowStock = false, page = 1, limit = 20 }, client = null) {
   const offset = (page - 1) * limit
 
   const baseSelect = `
-    SELECT id, item, curramount, lowstock
+    SELECT id, item, vendor, curramount, restockamount, unitcost, serving, lowstock
     FROM inventory
   `;
 
@@ -89,7 +89,7 @@ async function list({ lowStock = false, page = 1, limit = 20 }, client = null) {
 }
 
 // Create a new inventory item
-async function createItem({ item, curramount = 0 }, client = null) {
+async function createItem({ item, curramount = 0, restockamount = null, unitcost = null, vendor = null, serving = null }, client = null) {
   if (!item || typeof item !== 'string') {
     throw new Error('ITEM_REQUIRED');
   }
@@ -98,12 +98,18 @@ async function createItem({ item, curramount = 0 }, client = null) {
 
   // lowstock is derived from the threshold constant you already use
   const low = qty < LOW_STOCK_THRESHOLD;
-
+  
+  // Always include all fields, using NULL for missing values
+  const vendorValue = vendor && typeof vendor === 'string' && vendor.trim() ? vendor.trim() : null;
+  const restockValue = restockamount != null ? Number(restockamount) : null;
+  const costValue = unitcost != null ? Number(unitcost) : null;
+  const servingValue = serving != null ? Number(serving) : null;
+  
   const { rows } = await db.query(
-    `INSERT INTO inventory (item, curramount, lowstock)
-     VALUES ($1, $2, $3)
-     RETURNING id, item, curramount, lowstock`,
-    [item.trim(), qty, low]
+    `INSERT INTO inventory (item, curramount, lowstock, restockamount, unitcost, vendor, serving)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id, item, vendor, curramount, restockamount, unitcost, serving, lowstock`,
+    [item.trim(), qty, low, restockValue, costValue, vendorValue, servingValue]
   );
   return rows[0];
 }
@@ -114,11 +120,15 @@ async function updateItem(id, fields = {}, client = null) {
   const db = client || pool;
   if (typeof fields.item === 'string') updates.item = fields.item.trim();
   if (fields.curramount !== undefined) updates.curramount = Number(fields.curramount);
+  if (fields.vendor !== undefined) updates.vendor = fields.vendor;
+  if (fields.restockamount !== undefined) updates.restockamount = fields.restockamount != null ? Number(fields.restockamount) : null;
+  if (fields.unitcost !== undefined) updates.unitcost = fields.unitcost != null ? Number(fields.unitcost) : null;
+  if (fields.serving !== undefined) updates.serving = fields.serving != null ? Number(fields.serving) : null;
 
   // nothing to update
   if (Object.keys(updates).length === 0) {
     const { rows } = await db.query(
-      `SELECT id, item, curramount, lowstock FROM inventory WHERE id = $1`,
+      `SELECT id, item, vendor, curramount, restockamount, unitcost, serving, lowstock FROM inventory WHERE id = $1`,
       [id]
     );
     return rows[0] || null;
@@ -126,7 +136,7 @@ async function updateItem(id, fields = {}, client = null) {
 
   // recompute lowstock if quantity provided (else keep existing)
   if (updates.curramount !== undefined) {
-    updates.lowstock = updates.curramount < LOW_STOCK_THRESHOLD;
+    updates.lowstock = updates.curramount < 30;
   }
 
   // dynamic SET clause
@@ -137,10 +147,47 @@ async function updateItem(id, fields = {}, client = null) {
   const { rows } = await db.query(
     `UPDATE inventory SET ${set}
      WHERE id = $${cols.length + 1}
-     RETURNING id, item, curramount, lowstock`,
+     RETURNING id, item, vendor, curramount, restockamount, unitcost, serving, lowstock`,
     [...vals, id]
   );
   return rows[0] || null;
+}
+
+// Restock an inventory item (adds restockamount to curramount)
+async function restockItem(id, client = null) {
+  const db = client || pool;
+  
+  // Get current item to check restockamount
+  const { rows: currentRows } = await db.query(
+    'SELECT curramount, restockamount FROM inventory WHERE id = $1',
+    [id]
+  );
+  
+  if (currentRows.length === 0) {
+    throw new Error('Item not found');
+  }
+  
+  const current = currentRows[0];
+  const restockAmount = current.restockamount || 0;
+  const newAmount = Number(current.curramount) + Number(restockAmount);
+  const newLowStock = newAmount < 30;
+  
+  const { rows } = await db.query(
+    `UPDATE inventory 
+     SET curramount = $1, lowstock = $2
+     WHERE id = $3
+     RETURNING id, item, vendor, curramount, restockamount, unitcost, serving, lowstock`,
+    [newAmount, newLowStock, id]
+  );
+  
+  return rows[0] || null;
+}
+
+// Delete an inventory item
+async function deleteItem(id, client = null) {
+  const db = client || pool;
+  await db.query('DELETE FROM inventory WHERE id = $1', [id]);
+  return { success: true };
 }
 
 async function getLowStockReport(connection = pool) {
@@ -178,5 +225,7 @@ module.exports = {
   list,
   createItem,
   updateItem,
+  deleteItem,
+  restockItem,
   getLowStockReport,
 };

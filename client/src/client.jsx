@@ -58,7 +58,7 @@ function Client() {
                 {/* manager login + panel */}
                 <Route path="/manager/login" element={<ManagerLogin />} />
                 {/* keep existing Admin link working as alias */}
-                <Route path="/admin/login" element={<ManagerLogin />} />
+                {/* <Route path="/admin/login" element={<ManagerLogin />} /> */}
                 <Route
                   path="/manager"
                   element={(
