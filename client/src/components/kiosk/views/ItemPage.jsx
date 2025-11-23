@@ -10,7 +10,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import currency from "currency.js";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import "../css/main.css";
+import "../css/contrast-toggle.css";
 
 export default function ItemPage() {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ export default function ItemPage() {
 
   return (
     <div className="kiosk-container">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>

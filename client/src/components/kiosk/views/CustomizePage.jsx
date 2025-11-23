@@ -11,8 +11,10 @@ import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
 import { useCart } from "./CartContext.jsx";
 import KioskCart from "./KioskCart.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import "../css/main.css";
 import "../css/customize-page.css";
+import "../css/contrast-toggle.css";
 
 export default function CustomizePage() {
   const navigate = useNavigate();
@@ -90,6 +92,7 @@ export default function CustomizePage() {
 
   return (
     <div className="kiosk-container">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>

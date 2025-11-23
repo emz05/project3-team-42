@@ -9,7 +9,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import "../css/main.css";
+import "../css/contrast-toggle.css";
 
 export default function CategoryPage() {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ export default function CategoryPage() {
 
   return (
     <div className="kiosk-container">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown"><LanguageDropdown /></div>
 
       <h2><TranslatedText text={"Select a Category"} /></h2>
@@ -34,7 +37,6 @@ export default function CategoryPage() {
             key={index}
             className="kiosk-card"
             onClick={() => navigate(`/kiosk/categories/${encodeURIComponent(cat.name)}`)}
-
           >
             <h3><TranslatedText text={cat.name} /></h3>
           </div>

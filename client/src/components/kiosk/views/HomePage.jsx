@@ -2,20 +2,25 @@
  * HomePage.jsx
  * -----------------------
  * - Kiosk landing screen shown before ordering.
- * - Lets users start an order and choose language.
+ * - Lets users start an order, choose language, and toggle contrast.
  */
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/kiosk.css";
+import "../css/contrast-toggle.css";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 
 export default function KioskHomePage() {
   const navigate = useNavigate();
 
   return (
     <div className="kiosk-page">
+      {/* Contrast toggle */}
+      <ContrastToggle />
+      
       {/* Kiosk language selector */}
       <div className="kiosk-language-dropdown"><LanguageDropdown/></div>
 

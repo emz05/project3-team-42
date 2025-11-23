@@ -12,11 +12,13 @@ import currency from "currency.js";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
 import { useCart } from "./CartContext.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import "../css/main.css";
+import "../css/contrast-toggle.css";
 
 export default function ReviewPage() {
   const navigate = useNavigate();
-  const { cart, clearCart, updateCart } = useCart();
+  const { cart, updateCart } = useCart();
 
   // Calculate totals (match cashier exactly)
   const subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -83,6 +85,7 @@ export default function ReviewPage() {
 
   return (
     <div className="kiosk-container">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>
