@@ -1,0 +1,44 @@
+/* Make the header an actual bar */
+.kiosk-header {
+  width: 100%;
+  padding: 20px 28px;  /* increased vertical padding */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-bottom: 2px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: 80px;   /* ensures the header is tall enough */
+}
+
+
+/* Left + right sections align content nicely */
+.kiosk-header-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.kiosk-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+}
+
+
+/* Center title stays centered regardless of left/right widths */
+.kiosk-header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.kiosk-header-title h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
