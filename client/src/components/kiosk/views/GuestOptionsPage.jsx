@@ -7,16 +7,22 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import "../css/kiosk.css";
 import "../css/main.css";
 import "../css/profile.css";
 import "../css/contrast-toggle.css";
-import LanguageDropdown from "../../common/LanguageDropdown.jsx";
+
 import TranslatedText from "../../common/TranslateText.jsx";
-import ContrastToggle from "./ContrastToggle.jsx";
+import KioskHeader from "../components/KioskHeader.jsx";
+import SpeakOnHover from "../components/SpeakOnHover.jsx";
+import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
 
 export default function GuestOptionsPage() {
   const navigate = useNavigate();
+
+  // Spoken title/summary
+  usePageSpeech("Guest options. Create a new drink, edit your cart, or go back.");
 
   function handleCreateNewDrink() {
     navigate("/kiosk/categories");
@@ -32,10 +38,7 @@ export default function GuestOptionsPage() {
 
   return (
     <div className="kiosk-page">
-      <ContrastToggle />
-      <div className="kiosk-language-dropdown">
-        <LanguageDropdown />
-      </div>
+      <KioskHeader />
 
       <div className="profile-welcome">
         <h1>
@@ -47,19 +50,25 @@ export default function GuestOptionsPage() {
         </p>
 
         <div className="kiosk-option-grid">
-          <button className="kiosk-action-button" onClick={handleCreateNewDrink}>
-            <TranslatedText text="Create New Drink" />
-          </button>
+          <SpeakOnHover text="Create new drink">
+            <button className="kiosk-action-button" onClick={handleCreateNewDrink}>
+              <TranslatedText text="Create New Drink" />
+            </button>
+          </SpeakOnHover>
 
-          <button className="kiosk-action-button secondary" onClick={handleEditDrink}>
-            <TranslatedText text="Edit Existing Drink" />
-          </button>
+          <SpeakOnHover text="Edit existing drink">
+            <button className="kiosk-action-button secondary" onClick={handleEditDrink}>
+              <TranslatedText text="Edit Existing Drink" />
+            </button>
+          </SpeakOnHover>
         </div>
 
         <div className="profile-back">
-          <button className="kiosk-nav" onClick={handleBack}>
-            <TranslatedText text="Back" />
-          </button>
+          <SpeakOnHover text="Back">
+            <button className="kiosk-nav" onClick={handleBack}>
+              <TranslatedText text="Back" />
+            </button>
+          </SpeakOnHover>
         </div>
       </div>
     </div>

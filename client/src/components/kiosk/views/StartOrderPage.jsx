@@ -5,16 +5,23 @@
  * - Lets customers pick guest checkout or profile login.
  */
 
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
-import ContrastToggle from "./ContrastToggle.jsx";
+
 import "../css/kiosk.css";
 import "../css/profile.css";
 import "../css/contrast-toggle.css";
 
+import KioskHeader from "../components/KioskHeader.jsx";
+import SpeakOnHover from "../components/SpeakOnHover.jsx";
+import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
+
 export default function StartOrderPage() {
   const navigate = useNavigate();
+
+  // Read page title / instructions when TTS is enabled
+  usePageSpeech("Start your order. Choose guest checkout or sign in with your phone number.");
 
   function handleGuest() {
     navigate("/kiosk/guest");
@@ -30,10 +37,8 @@ export default function StartOrderPage() {
 
   return (
     <div className="kiosk-page">
-      <ContrastToggle />
-      <div className="kiosk-language-dropdown">
-        <LanguageDropdown />
-      </div>
+      {/* Shared kiosk header with contrast, language, and TTS toggle */}
+      <KioskHeader />
 
       <div className="profile-welcome">
         <h1>
@@ -52,9 +57,11 @@ export default function StartOrderPage() {
             <p className="profile-card-text">
               <TranslatedText text="Build a drink without saving your history" />
             </p>
-            <button className="kiosk-action-button" onClick={handleGuest}>
-              <TranslatedText text="Continue as Guest" />
-            </button>
+            <SpeakOnHover text="Continue as guest">
+              <button className="kiosk-action-button" onClick={handleGuest}>
+                <TranslatedText text="Continue as Guest" />
+              </button>
+            </SpeakOnHover>
           </div>
 
           <div className="kiosk-choice-card">
@@ -64,16 +71,23 @@ export default function StartOrderPage() {
             <p className="profile-card-text">
               <TranslatedText text="Use your phone number to view past drinks" />
             </p>
-            <button className="kiosk-action-button secondary" onClick={handleProfile}>
-              <TranslatedText text="Use My Phone Number" />
-            </button>
+            <SpeakOnHover text="Use my phone number">
+              <button
+                className="kiosk-action-button secondary"
+                onClick={handleProfile}
+              >
+                <TranslatedText text="Use My Phone Number" />
+              </button>
+            </SpeakOnHover>
           </div>
         </div>
 
         <div className="profile-back">
-          <button className="kiosk-nav-start" onClick={handleBack}>
-            <TranslatedText text="Back to Start" />
-          </button>
+          <SpeakOnHover text="Back to start">
+            <button className="kiosk-nav-start" onClick={handleBack}>
+              <TranslatedText text="Back to Start" />
+            </button>
+          </SpeakOnHover>
         </div>
       </div>
     </div>
