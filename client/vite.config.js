@@ -10,7 +10,11 @@ export default defineConfig({
                 target: 'http://localhost:8080',
                 changeOrigin: true,
             }
-        }
+        },
+        headers: {
+            'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+            'Cross-Origin-Embedder-Policy': 'unsafe-none',
+        },
     },
     optimizeDeps: {
         // Exclude fsevents so Vite doesn't try to bundle the .node file
