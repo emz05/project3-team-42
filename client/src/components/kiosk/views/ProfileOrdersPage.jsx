@@ -5,17 +5,20 @@
  * - Reuses customer profile data in CartContext to avoid extra fetches.
  */
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "./CartContext.jsx";
 import { customerAPI } from "../../../services/api.js";
 import TranslatedText from "../../common/TranslateText.jsx";
-import LanguageDropdown from "../../common/LanguageDropdown.jsx";
-import ContrastToggle from "./ContrastToggle.jsx";
 import KioskCart from "./KioskCart.jsx";
+
 import "../css/main.css";
 import "../css/profile.css";
 import "../css/contrast-toggle.css";
+
+import KioskHeader from "../components/KioskHeader.jsx";
+import SpeakOnHover from "../components/SpeakOnHover.jsx";
+import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
 
 export default function ProfileOrdersPage() {
   const navigate = useNavigate();
@@ -36,6 +39,11 @@ export default function ProfileOrdersPage() {
   const [error, setError] = useState("");
   const [addError, setAddError] = useState("");
   const [addStatus, setAddStatus] = useState({});
+
+  // Page-level speech: what this screen is about
+  usePageSpeech(
+    "Past drinks. Review your previous orders, add a drink to your cart, or create a new drink."
+  );
 
   useEffect(() => {
     if (!phone) {
@@ -148,65 +156,70 @@ export default function ProfileOrdersPage() {
   const showEmptyMessage = !loading && !hasOrders && !error;
 
   return (
-    <div className="kiosk-container profile-orders-page">
-      <ContrastToggle />
-      <div className="kiosk-language-dropdown">
-        <LanguageDropdown />
-      </div>
-      <KioskCart />
+    <div className="kiosk-page">
+      <KioskHeader />
 
-      <h2>
-        <TranslatedText text="Past Drinks" />
-      </h2>
+      <div className="kiosk-container profile-orders-page">
+        <KioskCart />
 
-      {phone && (
-        <p className="profile-phone">
-          <TranslatedText text={`Phone: ${phone}`} />
-        </p>
-      )}
+        <h2>
+          <TranslatedText text="Past Drinks" />
+        </h2>
 
-      {loading && (
-        <p className="profile-orders-message">
-          <TranslatedText text="Loading your drinks..." />
-        </p>
-      )}
+        {phone && (
+          <p className="profile-phone">
+            <TranslatedText text={`Phone: ${phone}`} />
+          </p>
+        )}
 
-      {error && (
-        <p className="profile-orders-error">
-          <TranslatedText text={error} />
-        </p>
-      )}
+        {loading && (
+          <p className="profile-orders-message">
+            <TranslatedText text="Loading your drinks..." />
+          </p>
+        )}
 
-      {showEmptyMessage && (
-        <p className="profile-orders-message">
-          <TranslatedText text="No previous drinks found." />
-        </p>
-      )}
+        {error && (
+          <p className="profile-orders-error">
+            <TranslatedText text={error} />
+          </p>
+        )}
 
-      {addError && (
-        <p className="profile-orders-error">
-          <TranslatedText text={addError} />
-        </p>
-      )}
+        {showEmptyMessage && (
+          <p className="profile-orders-message">
+            <TranslatedText text="No previous drinks found." />
+          </p>
+        )}
 
-      <div className="profile-orders-list">
-        {formattedOrders.map((order) => (
-          <OrderCard
-            key={order.id}
-            order={order}
-            onAddDrink={handleAddPastDrink}
-            addStatus={addStatus}
-          />
-        ))}
-      </div>
+        {addError && (
+          <p className="profile-orders-error">
+            <TranslatedText text={addError} />
+          </p>
+        )}
 
-      <div className="profile-order-actions">
-        <button className="kiosk-action-button" onClick={handleCreateNewDrink}>
-          <TranslatedText text="Create New Drink" />
-        </button>
-        <button className="kiosk-nav-orders" onClick={handleGoBack}>
-          <TranslatedText text="Back to Options" />
-        </button>
+        <div className="profile-orders-list">
+          {formattedOrders.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              onAddDrink={handleAddPastDrink}
+              addStatus={addStatus}
+            />
+          ))}
+        </div>
+
+        <div className="profile-order-actions">
+          <SpeakOnHover text="Create new drink">
+            <button className="kiosk-action-button" onClick={handleCreateNewDrink}>
+              <TranslatedText text="Create New Drink" />
+            </button>
+          </SpeakOnHover>
+
+          <SpeakOnHover text="Back to options">
+            <button className="kiosk-nav-orders" onClick={handleGoBack}>
+              <TranslatedText text="Back to Options" />
+            </button>
+          </SpeakOnHover>
+        </div>
       </div>
     </div>
   );
@@ -314,16 +327,20 @@ function DrinkItem({ item, isLast, onAddDrink, status, historyKey }) {
         </div>
       )}
 
-      <button
-        className="profile-order-add"
-        onClick={handleAddClick}
-        disabled={isDisabled}
-      >
-        <TranslatedText text={buttonText} />
-      </button>
+      <SpeakOnHover text="Add this drink to cart">
+        <button
+          className="profile-order-add"
+          onClick={handleAddClick}
+          disabled={isDisabled}
+        >
+          <TranslatedText text={buttonText} />
+        </button>
+      </SpeakOnHover>
     </div>
   );
 }
+
+// ---- helpers below remain unchanged ----
 
 function buildCartItemFromHistory(item, drinkDetails) {
   if (!item) {
