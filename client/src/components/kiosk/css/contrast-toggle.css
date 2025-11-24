@@ -58,8 +58,16 @@ body.high-contrast .kiosk-page {
 body.high-contrast h1,
 body.high-contrast h2,
 body.high-contrast h3,
+body.high-contrast h4,
 body.high-contrast p,
-body.high-contrast span {
+body.high-contrast span,
+body.high-contrast strong,
+body.high-contrast div {
+    color: #ffffff !important;
+}
+
+/* Ensure inline styles don't override */
+body.high-contrast [style*="color"] {
     color: #ffffff !important;
 }
 
@@ -194,6 +202,90 @@ body.high-contrast .kiosk-language-dropdown select {
     background-color: #1f2937;
     color: #ffffff;
     border: 2px solid #ffffff;
+}
+
+/* Profile page styles in high contrast */
+body.high-contrast .profile-welcome,
+body.high-contrast .profile-orders-page {
+    background-color: #000000;
+}
+
+body.high-contrast .kiosk-choice-card,
+body.high-contrast .profile-order-card {
+    background-color: #1f2937;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-choice-card:hover,
+body.high-contrast .profile-order-card:hover {
+    background-color: #374151;
+    border-color: #fbbf24;
+}
+
+body.high-contrast .profile-card-text,
+body.high-contrast .profile-subtitle,
+body.high-contrast .profile-phone,
+body.high-contrast .profile-order-date,
+body.high-contrast .profile-order-item-details {
+    color: #e5e7eb !important;
+}
+
+body.high-contrast .profile-order-add {
+    background-color: #fbbf24;
+    color: #000000;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .profile-order-add:hover:not(:disabled) {
+    background-color: #f59e0b;
+}
+
+body.high-contrast .profile-order-add:disabled {
+    opacity: 0.5;
+    background-color: #6b7280;
+}
+
+body.high-contrast .profile-orders-message {
+    color: #e5e7eb !important;
+}
+
+body.high-contrast .profile-orders-error {
+    background-color: #7f1d1d;
+    color: #ffffff !important;
+    border: 2px solid #ef4444;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+body.high-contrast .kiosk-nav-start,
+body.high-contrast .kiosk-nav-orders {
+    background-color: #374151;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .kiosk-nav-start:hover,
+body.high-contrast .kiosk-nav-orders:hover {
+    background-color: #4b5563;
+    border-color: #fbbf24;
+}
+
+body.high-contrast .kiosk-action-button.secondary {
+    background-color: #6366f1;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-action-button.secondary:hover {
+    background-color: #4f46e5;
+}
+
+body.high-contrast .kiosk-action-button.success {
+    background-color: #10b981;
+    border: 3px solid #ffffff;
+}
+
+body.high-contrast .kiosk-action-button.success:hover {
+    background-color: #059669;
 }
 
 /* Responsive */

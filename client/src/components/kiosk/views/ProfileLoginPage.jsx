@@ -10,10 +10,12 @@ import { useNavigate } from "react-router-dom";
 import LoginPanel from "../../cashier/views/LoginPanel.jsx";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import { useCart } from "./CartContext.jsx";
 import { customerAPI } from "../../../services/api.js";
 import "../css/kiosk.css";
 import "../css/profile.css";
+import "../css/contrast-toggle.css";
 
 export default function ProfileLoginPage() {
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ export default function ProfileLoginPage() {
 
   return (
     <div className="kiosk-page">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>

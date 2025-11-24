@@ -11,9 +11,11 @@ import { useCart } from "./CartContext.jsx";
 import { customerAPI } from "../../../services/api.js";
 import TranslatedText from "../../common/TranslateText.jsx";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import KioskCart from "./KioskCart.jsx";
 import "../css/main.css";
 import "../css/profile.css";
+import "../css/contrast-toggle.css";
 
 export default function ProfileOrdersPage() {
   const navigate = useNavigate();
@@ -147,6 +149,7 @@ export default function ProfileOrdersPage() {
 
   return (
     <div className="kiosk-container profile-orders-page">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>
@@ -330,7 +333,7 @@ function buildCartItemFromHistory(item, drinkDetails) {
       quantity: 1,
       unitPrice: 0,
       totalPrice: 0,
-      iceLevel: "Regular Ice",
+      iceLevel: "Reg",
       sweetness: "100%",
       toppings: [],
       toppingDisplayNames: [],
@@ -396,7 +399,7 @@ function buildCartItemFromHistory(item, drinkDetails) {
   }
 
   const totalPrice = unitPrice * quantity;
-  const iceLevel = normalizeIceLevel(item.iceLevel);
+  const iceLevel = convertIceLevelToDBFormat(item.iceLevel);
 
   let sweetness = "100%";
   if (item.sweetness) {
@@ -503,10 +506,33 @@ function normalizeIceLevel(value) {
     return map[trimmed];
   }
 
-  const upper = trimmed.toUpperCase();
-  if (map[upper]) {
-    return map[upper];
+  return trimmed;
+}
+
+function convertIceLevelToDBFormat(value) {
+  if (!value) {
+    return "Reg";
   }
 
-  return trimmed;
+  const map = {
+    "Regular Ice": "Reg",
+    Regular: "Reg",
+    Reg: "Reg",
+    "Light Ice": "Lt",
+    Light: "Lt",
+    Lt: "Lt",
+    "No Ice": "No",
+    None: "No",
+    No: "No",
+    "Extra Ice": "Ext",
+    Extra: "Ext",
+    Ext: "Ext",
+  };
+
+  const trimmed = String(value).trim();
+  if (map[trimmed]) {
+    return map[trimmed];
+  }
+
+  return "Reg";
 }

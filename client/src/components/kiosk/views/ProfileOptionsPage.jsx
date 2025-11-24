@@ -9,10 +9,12 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
+import ContrastToggle from "./ContrastToggle.jsx";
 import { useCart } from "./CartContext.jsx";
 import "../css/kiosk.css";
 import "../css/main.css";
 import "../css/profile.css";
+import "../css/contrast-toggle.css";
 
 export default function ProfileOptionsPage() {
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ export default function ProfileOptionsPage() {
 
   return (
     <div className="kiosk-page">
+      <ContrastToggle />
       <div className="kiosk-language-dropdown">
         <LanguageDropdown />
       </div>
