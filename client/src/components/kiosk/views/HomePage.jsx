@@ -13,6 +13,7 @@ import TranslatedText from "../../common/TranslateText.jsx";
 
 import KioskHeader from "../components/KioskHeader.jsx";
 import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
+import SpeakOnHover from "../components/SpeakOnHover.jsx";
 
 export default function KioskHomePage() {
   const navigate = useNavigate();
@@ -30,12 +31,15 @@ export default function KioskHomePage() {
         <p><TranslatedText text={'Tap to begin your order'}/></p>
 
         {/* Start kiosk ordering flow */}
-        <button
-          className="kiosk-start-button"
-          onClick={() => navigate("/kiosk/start")}
-        >
-          <TranslatedText text={'Start Order'}/>
-        </button>
+        <SpeakOnHover text="Start Order">
+          <button
+            className="kiosk-start-button"
+            onClick={() => navigate("/kiosk/start")}
+          >
+            <TranslatedText text={'Start Order'}/>
+          </button>
+        </SpeakOnHover>
+
       </div>
     </div>
   );
