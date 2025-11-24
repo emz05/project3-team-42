@@ -33,6 +33,7 @@ const ManagerProtectedRoute = ({ children }) => {
 
 import { ContrastProvider } from './components/kiosk/views/ContrastContext.jsx';
 import { CartProvider } from "./components/kiosk/views/CartContext.jsx";
+import { AccessibilityProvider } from './context/AccessibilityContext.jsx';
 
 function Client() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
@@ -42,6 +43,7 @@ function Client() {
   }
 
   return (
+    <AccessibilityProvider>
       <TranslationWrapper>
         <GoogleOAuthProvider clientId={googleClientId}>
           <ManagerAuthProvider>
@@ -51,27 +53,30 @@ function Client() {
                 <Route path="/cashier/login" element={<LoginPanel />} />
                 <Route path="/cashier/order" element={<OrderPanel />} />
 
-              {/* kiosk */}
-              <Route path="/kiosk/*" element={
-                <ContrastProvider>
-                  <CartProvider>
-                    <Routes>
-                      <Route path="" element={<KioskHomePage />} />
-                      <Route path="start" element={<StartOrderPage />} />
-                    <Route path="guest" element={<GuestOptionsPage />} />
-                    <Route path="profile/login" element={<ProfileLoginPage />} />
-                    <Route path="profile/options" element={<ProfileOptionsPage />} />
-                    <Route path="profile/orders" element={<ProfileOrdersPage />} />
-                    <Route path="categories" element={<CategoryPage />} />
-                      <Route path="categories/:categoryId" element={<ItemPage />} />
-                      <Route path="item/:itemId/customize" element={<CustomizePage />} />
-                      <Route path="review" element={<ReviewPage />} />
-                      <Route path="confirmation" element={<ConfirmationPage />} />
-                      <Route path="payment" element={<PaymentPage />} />
-                    </Routes>
-                  </CartProvider>
-                </ContrastProvider>
-              } />
+                {/* kiosk */}
+                <Route
+                  path="/kiosk/*"
+                  element={
+                    <ContrastProvider>
+                      <CartProvider>
+                        <Routes>
+                          <Route path="" element={<KioskHomePage />} />
+                          <Route path="start" element={<StartOrderPage />} />
+                          <Route path="guest" element={<GuestOptionsPage />} />
+                          <Route path="profile/login" element={<ProfileLoginPage />} />
+                          <Route path="profile/options" element={<ProfileOptionsPage />} />
+                          <Route path="profile/orders" element={<ProfileOrdersPage />} />
+                          <Route path="categories" element={<CategoryPage />} />
+                          <Route path="categories/:categoryId" element={<ItemPage />} />
+                          <Route path="item/:itemId/customize" element={<CustomizePage />} />
+                          <Route path="review" element={<ReviewPage />} />
+                          <Route path="confirmation" element={<ConfirmationPage />} />
+                          <Route path="payment" element={<PaymentPage />} />
+                        </Routes>
+                      </CartProvider>
+                    </ContrastProvider>
+                  }
+                />
 
                 {/* default home and error pages */}
                 <Route path="/home" element={<HomePanel />} />
@@ -80,8 +85,6 @@ function Client() {
 
                 {/* manager login + panel */}
                 <Route path="/manager/login" element={<ManagerLogin />} />
-                {/* keep existing Admin link working as alias */}
-                {/* <Route path="/admin/login" element={<ManagerLogin />} /> */}
                 <Route
                   path="/manager"
                   element={(
@@ -100,12 +103,8 @@ function Client() {
           </ManagerAuthProvider>
         </GoogleOAuthProvider>
       </TranslationWrapper>
+    </AccessibilityProvider>
   );
-}
-
-
-
-
 
 
 export default Client;
