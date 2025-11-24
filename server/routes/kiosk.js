@@ -20,7 +20,7 @@ router.get("/categories", async (req, res) => {
 router.get("/categories/:category/drinks", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, drink_name, drink_price, drink_image_path FROM drink WHERE category = $1 ORDER BY id",
+      "SELECT id, drink_name, drink_price, drink_image_path, description, allergens FROM drink WHERE category = $1 ORDER BY id",
       [req.params.category]
     );
     res.json(result.rows);
@@ -33,7 +33,7 @@ router.get("/categories/:category/drinks", async (req, res) => {
 router.get("/item/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, drink_name, drink_price, drink_image_path, category FROM drink WHERE id = $1",
+      "SELECT id, drink_name, drink_price, drink_image_path, description, allergens, category FROM drink WHERE id = $1",
       [req.params.id]
     );
 
