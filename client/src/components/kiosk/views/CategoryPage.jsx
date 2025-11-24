@@ -7,15 +7,21 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
-import ContrastToggle from "./ContrastToggle.jsx";
+
 import "../css/main.css";
 import "../css/contrast-toggle.css";
+
+import KioskHeader from "../components/KioskHeader.jsx";
+import SpeakOnHover from "../components/SpeakOnHover.jsx";
+import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
 
 export default function CategoryPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+
+  // Page-level spoken summary
+  usePageSpeech("Select a drink category to get started.");
 
   useEffect(() => {
     fetch("/api/kiosk/categories")
@@ -25,30 +31,42 @@ export default function CategoryPage() {
   }, []);
 
   return (
-    <div className="kiosk-container">
-      <ContrastToggle />
-      <div className="kiosk-language-dropdown"><LanguageDropdown /></div>
+    <div className="kiosk-page">
+      <KioskHeader />
 
-      <h2><TranslatedText text={"Select a Category"} /></h2>
+      <div className="kiosk-container">
+        <h2>
+          <TranslatedText text={"Select a Category"} />
+        </h2>
 
-      <div className="kiosk-grid">
-        {categories.map((cat, index) => (
-          <div
-            key={index}
-            className="kiosk-card"
-            onClick={() => navigate(`/kiosk/categories/${encodeURIComponent(cat.name)}`)}
-          >
-            <h3><TranslatedText text={cat.name} /></h3>
-          </div>
-        ))}
+        <div className="kiosk-grid">
+          {categories.map((cat, index) => (
+            <SpeakOnHover text={cat.name} key={index}>
+              <div
+                className="kiosk-card"
+                onClick={() =>
+                  navigate(`/kiosk/categories/${encodeURIComponent(cat.name)}`)
+                }
+              >
+                <h3>
+                  <TranslatedText text={cat.name} />
+                </h3>
+              </div>
+            </SpeakOnHover>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "1.5rem" }}>
+          <SpeakOnHover text="Back to start">
+            <button
+              className="kiosk-nav"
+              onClick={() => navigate("/kiosk/start")}
+            >
+              <TranslatedText text={"Back to Start"} />
+            </button>
+          </SpeakOnHover>
+        </div>
       </div>
-
-      <button
-        className="kiosk-nav"
-        onClick={() => navigate("/kiosk/start")}
-      >
-        <TranslatedText text={"Back to Start"} />
-      </button>
     </div>
   );
 }
