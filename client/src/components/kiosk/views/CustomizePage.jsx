@@ -7,14 +7,17 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
 import { useCart } from "./CartContext.jsx";
 import KioskCart from "./KioskCart.jsx";
-import ContrastToggle from "./ContrastToggle.jsx";
+
 import "../css/main.css";
 import "../css/customize-page.css";
 import "../css/contrast-toggle.css";
+
+import KioskHeader from "../components/KioskHeader.jsx";
+import SpeakOnHover from "../components/SpeakOnHover.jsx";
+import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
 
 export default function CustomizePage() {
   const navigate = useNavigate();
@@ -33,17 +36,17 @@ export default function CustomizePage() {
     { display: "Regular Ice", value: "Reg" },
     { display: "Light Ice", value: "Lt" },
     { display: "No Ice", value: "No" },
-    { display: "Extra Ice", value: "Ext" }
+    { display: "Extra Ice", value: "Ext" },
   ];
-  
+
   const sweetnessOptions = ["100%", "80%", "50%", "30%", "0%", "120%"];
-  
+
   // Topping mapping: display text -> database value (4 char limit)
   const toppingOptions = [
     { display: "Boba", value: "Boba" },
-    { display: "Jelly", value: "Jely" },  // 4 chars
-    { display: "Ice Cream", value: "IceC" },  // 4 chars
-    { display: "Condensed Milk", value: "Milk" }  // 4 chars
+    { display: "Jelly", value: "Jely" },
+    { display: "Ice Cream", value: "IceC" },
+    { display: "Condensed Milk", value: "Milk" },
   ];
 
   // Fetch drink info from backend
@@ -54,11 +57,30 @@ export default function CustomizePage() {
       .catch((err) => console.error("Failed to fetch drink:", err));
   }, [itemId]);
 
-  if (!drink) return <div>Loading...</div>;
+  // 🔊 Spoken summary for this page (must be before any early return)
+  usePageSpeech(
+    drink
+      ? "Customize your drink. Choose an ice level, a sweetness level, and optional toppings."
+      : "Loading drink details."
+  );
+
+  // While loading, still show header so the layout doesn’t feel broken
+  if (!drink) {
+    return (
+      <div className="kiosk-page">
+        <KioskHeader />
+        <div className="kiosk-container">
+          <p>
+            <TranslatedText text="Loading drink..." />
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Toggle topping selection
   const toggleTopping = (topping) => {
-    const isAlreadySelected = toppings.some(t => t.value === topping.value);
+    const isAlreadySelected = toppings.some((t) => t.value === topping.value);
 
     if (isAlreadySelected) {
       setToppings(toppings.filter((t) => t.value !== topping.value));
@@ -77,8 +99,8 @@ export default function CustomizePage() {
       quantity: 1,
       iceLevel: iceLevel,
       sweetness: sweetness,
-      toppings: toppings.map(t => t.value), // Store abbreviated values for DB
-      toppingDisplayNames: toppings.map(t => t.display), // Store display names for UI
+      toppings: toppings.map((t) => t.value), // abbreviated values for DB
+      toppingDisplayNames: toppings.map((t) => t.display), // display names for UI
       totalPrice: drink.drink_price || drink.price,
     };
 
@@ -91,11 +113,8 @@ export default function CustomizePage() {
   };
 
   return (
-    <div className="kiosk-container">
-      <ContrastToggle />
-      <div className="kiosk-language-dropdown">
-        <LanguageDropdown />
-      </div>
+    <div className="kiosk-page">
+      <KioskHeader />
 
       <h2>
         <TranslatedText text={"Customize Your Drink"} /> —{" "}
@@ -110,15 +129,16 @@ export default function CustomizePage() {
           </h3>
           <div className="option-grid">
             {iceOptions.map((option) => (
-              <button
-                key={option.value}
-                className={`option-btn ${
-                  iceLevel === option.value ? "selected" : ""
-                }`}
-                onClick={() => setIceLevel(option.value)}
-              >
-                <TranslatedText text={option.display} />
-              </button>
+              <SpeakOnHover text={option.display} key={option.value}>
+                <button
+                  className={`option-btn ${
+                    iceLevel === option.value ? "selected" : ""
+                  }`}
+                  onClick={() => setIceLevel(option.value)}
+                >
+                  <TranslatedText text={option.display} />
+                </button>
+              </SpeakOnHover>
             ))}
           </div>
         </section>
@@ -130,15 +150,16 @@ export default function CustomizePage() {
           </h3>
           <div className="option-grid">
             {sweetnessOptions.map((option) => (
-              <button
-                key={option}
-                className={`option-btn ${
-                  sweetness === option ? "selected" : ""
-                }`}
-                onClick={() => setSweetness(option)}
-              >
-                <TranslatedText text={option} />
-              </button>
+              <SpeakOnHover text={`${option} sweetness`} key={option}>
+                <button
+                  className={`option-btn ${
+                    sweetness === option ? "selected" : ""
+                  }`}
+                  onClick={() => setSweetness(option)}
+                >
+                  <TranslatedText text={option} />
+                </button>
+              </SpeakOnHover>
             ))}
           </div>
         </section>
@@ -150,33 +171,44 @@ export default function CustomizePage() {
           </h3>
           <div className="option-grid">
             {toppingOptions.map((option) => (
-              <button
-                key={option.value}
-                className={`option-btn ${
-                  toppings.some(t => t.value === option.value) ? "selected" : ""
-                }`}
-                onClick={() => toggleTopping(option)}
-              >
-                <TranslatedText text={option.display} />
-              </button>
+              <SpeakOnHover text={option.display} key={option.value}>
+                <button
+                  className={`option-btn ${
+                    toppings.some((t) => t.value === option.value)
+                      ? "selected"
+                      : ""
+                  }`}
+                  onClick={() => toggleTopping(option)}
+                >
+                  <TranslatedText text={option.display} />
+                </button>
+              </SpeakOnHover>
             ))}
           </div>
         </section>
       </div>
 
       <div className="kiosk-buttons">
-        <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
-          <TranslatedText text={"Back to Items"} />
-        </button>
-        <button className="kiosk-action-button" onClick={handleAddToCart}>
-          <TranslatedText text={"Add to Cart"} />
-        </button>
-        <button
-          className="kiosk-action-button"
-          onClick={() => navigate("/kiosk/review")}
-        >
-          <TranslatedText text={"Review Order"} />
-        </button>
+        <SpeakOnHover text="Back to items">
+          <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
+            <TranslatedText text={"Back to Items"} />
+          </button>
+        </SpeakOnHover>
+
+        <SpeakOnHover text="Add to cart">
+          <button className="kiosk-action-button" onClick={handleAddToCart}>
+            <TranslatedText text={"Add to Cart"} />
+          </button>
+        </SpeakOnHover>
+
+        <SpeakOnHover text="Review order">
+          <button
+            className="kiosk-action-button"
+            onClick={() => navigate("/kiosk/review")}
+          >
+            <TranslatedText text={"Review Order"} />
+          </button>
+        </SpeakOnHover>
       </div>
 
       {/* Mini cart */}
