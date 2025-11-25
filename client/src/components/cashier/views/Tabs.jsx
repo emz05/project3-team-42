@@ -1,3 +1,9 @@
+/*
+ * Tabs.jsx
+ * -----------------------
+ * - tab component to show the different pages
+ * - alternate between drink categories
+ */
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import TranslatedText from "../../common/TranslateText.jsx";

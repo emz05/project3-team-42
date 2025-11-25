@@ -1,3 +1,9 @@
+/*
+ * ManagerPanel.jsx
+ * -----------------------
+ * - displays graphics to show data metrics
+ * - report handling
+ */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/manager-panel.css';
