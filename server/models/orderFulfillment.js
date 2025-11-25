@@ -1,3 +1,7 @@
+/*
+- fills in orders table after payment processed
+- handled when stripe's payment intent is successful
+ */
 const Orders = require('./orders');
 const Inventory = require('./inventory');
 
