@@ -1,3 +1,7 @@
+/*
+- connection from frontend to backend
+- facilitates requests and responses
+ */
 import axios from 'axios';
 
 // Use Vite proxy in development, or explicit URL if provided
