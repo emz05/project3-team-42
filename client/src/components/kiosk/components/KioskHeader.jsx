@@ -7,7 +7,11 @@ import "../css/kiosk-header.css";
 
 export default function KioskHeader() {
   return (
-    <div className="kiosk-header">
+    <header
+      className="kiosk-header"
+      role="banner"
+      aria-label="Kiosk accessibility controls"
+    >
       {/* Left: High Contrast */}
       <div className="kiosk-header-left">
         <ContrastToggle />
@@ -23,6 +27,6 @@ export default function KioskHeader() {
         <LanguageDropdown />
         <TextToSpeechToggle />
       </div>
-    </div>
+    </header>
   );
 }
