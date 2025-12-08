@@ -40,8 +40,9 @@ export default function GuestOptionsPage() {
     <div className="kiosk-page">
       <KioskHeader />
 
-      <div className="profile-welcome">
-        <h1>
+      <main role="main" aria-labelledby="guest-options-title">
+        <div className="profile-welcome">
+        <h1 id="guest-options-title">
           <TranslatedText text="Continue as Guest" />
         </h1>
 
@@ -70,7 +71,8 @@ export default function GuestOptionsPage() {
             </button>
           </SpeakOnHover>
         </div>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
