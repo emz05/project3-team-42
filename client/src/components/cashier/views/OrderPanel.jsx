@@ -158,7 +158,9 @@ const OrderPanel = () => {
 
     if (!employee) { return <p></p>; }
 
-    const filteredDrinks = drinks.filter(d => d.category === activeCategory);
+    const filteredDrinks = activeCategory.toLowerCase() === 'seasonal'
+        ? drinks.filter(d => d.isSeasonal)
+        : drinks.filter(d => d.category === activeCategory);
 
     // Add item to cart or increase quantity if already exists
     const handleAddToCart = (cartItem) => {
