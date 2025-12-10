@@ -19,6 +19,8 @@ import KioskHeader from "../components/KioskHeader.jsx";
 import SpeakOnHover from "../components/SpeakOnHover.jsx";
 import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
 
+import { api } from "../../../services/api.js";
+
 export default function CustomizePage() {
   const navigate = useNavigate();
   const { itemId } = useParams();
@@ -51,9 +53,8 @@ export default function CustomizePage() {
 
   // Fetch drink info from backend
   useEffect(() => {
-    fetch(`/api/kiosk/item/${itemId}`)
-      .then((res) => res.json())
-      .then((data) => setDrink(data))
+   api.get(`/kiosk/item/${itemId}`)
+      .then((res) => setDrink(res.data))
       .catch((err) => console.error("Failed to fetch drink:", err));
   }, [itemId]);
 
