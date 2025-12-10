@@ -15,6 +15,7 @@ import "../css/contrast-toggle.css";
 import KioskHeader from "../components/KioskHeader.jsx";
 import SpeakOnHover from "../components/SpeakOnHover.jsx";
 import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
+import { api } from "../../../services/api.js"
 
 export default function ItemPage() {
   const navigate = useNavigate();
@@ -26,11 +27,10 @@ export default function ItemPage() {
   usePageSpeech(`Select a drink in the category ${categoryId}.`);
 
   useEffect(() => {
-    fetch(`/api/kiosk/categories/${encodeURIComponent(categoryId)}/drinks`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Received drinks:", data);
-        setItems(data);
+      api.get(`/kiosk/categories/${encodeURIComponent(categoryId)}/drinks`)
+      .then((res) => {
+        console.log("Received drinks:", res.data);
+        setItems(res.data);
       })
       .catch((err) => console.error("Failed to fetch drinks:", err));
   }, [categoryId]);
