@@ -270,6 +270,7 @@ export default function PaymentPage() {
           totalPrice: Number(
             (Number(item.totalPrice ?? item.unitPrice ?? 0)).toFixed(2)
           ),
+          temperature: item.temperature,
           size: item.size,
           iceLevel: to4(item.iceLevel),
           sweetness: to4(item.sweetness),

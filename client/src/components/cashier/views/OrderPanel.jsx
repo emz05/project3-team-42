@@ -32,6 +32,7 @@ function cloneCartForStorage(items) {
         unitPrice: item.unitPrice,
         quantity: item.quantity,
         size: item.size || item.selectedSize || '',
+        temperature: item.temperature || '',
         iceLevel: item.iceLevel || '',
         sweetness: item.sweetness || '',
         toppings: Array.isArray(item.toppings) ? item.toppings.filter(Boolean) : [],
@@ -47,6 +48,7 @@ function summarizeCartForSms(items) {
     return items.map((item) => ({
         drinkName: item.drinkName || `Drink #${item.drinkId}`,
         size: item.size || '',
+        temp: item.temperature || '',
         sugar: item.sweetness || '',
         ice: item.iceLevel || '',
         toppings: Array.isArray(item.toppings) ? item.toppings.filter(Boolean) : [],
@@ -167,6 +169,7 @@ const OrderPanel = () => {
         // Check if item with same customizations already exists
         const existingIndex = cartItems.findIndex(item =>
             item.drinkId === cartItem.drinkId &&
+            item.temperature === cartItem.temperature &&
             item.size === cartItem.size &&
             item.iceLevel === cartItem.iceLevel &&
             item.sweetness === cartItem.sweetness &&
@@ -196,6 +199,7 @@ const OrderPanel = () => {
             const filteredCart = cartItems.filter(item =>
                 !(
                     item.drinkId === updatedItem.drinkId &&
+                    item.temperature === updatedItem.temperature &&
                     item.size === updatedItem.size &&
                     item.iceLevel === updatedItem.iceLevel &&
                     item.sweetness === updatedItem.sweetness &&
@@ -207,6 +211,7 @@ const OrderPanel = () => {
             const updatedCart = cartItems.map(item => {
                 const isSameItem =
                     item.drinkId === updatedItem.drinkId &&
+                    item.temperature === updatedItem.temperature &&
                     item.size === updatedItem.size &&
                     item.iceLevel === updatedItem.iceLevel &&
                     item.sweetness === updatedItem.sweetness &&
@@ -382,6 +387,7 @@ const OrderPanel = () => {
                     drinkID: obj.drinkId,
                     quantity: obj.quantity,
                     totalPrice: obj.totalPrice,
+                    temperature: obj.temperature,
                     size: obj.size,
                     iceLevel: obj.iceLevel,
                     sweetness: obj.sweetness,

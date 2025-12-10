@@ -33,6 +33,12 @@ const CartCard = ({ item, onUpdate }) => {
     const buildCustomizationText = () => {
         const customizations = [];
 
+        if (item.temperature && item.temperature !== 'Iced') {
+            customizations.push(item.temperature);
+        } else if (item.temperature === 'Iced') {
+            customizations.push('Iced');
+        }
+
         if (item.size) {
             customizations.push(item.size);
         }

@@ -11,10 +11,12 @@ async function fulfillCartItem(item, receiptId, connection) {
     let toppingsValue = item.toppings;
     if (Array.isArray(item.toppings)) { toppingsValue = item.toppings.join(', '); }
 
-    // Include drink size in the stored customizations without affecting inventory updates
-    const toppingsWithSize = item.size
-        ? `Size: ${item.size}${toppingsValue ? ` | ${toppingsValue}` : ''}`
-        : toppingsValue;
+    // Include drink size and temperature in the stored customizations without affecting inventory updates
+    const customizationParts = [];
+    if (item.size) customizationParts.push(`Size: ${item.size}`);
+    if (item.temperature) customizationParts.push(`Temp: ${item.temperature}`);
+    if (toppingsValue) customizationParts.push(toppingsValue);
+    const toppingsWithSize = customizationParts.join(' | ') || null;
 
     await Orders.addOrderItem(
         receiptId,

@@ -29,6 +29,7 @@ export default function CustomizePage() {
   const [drink, setDrink] = useState(null);
 
   // Default customization states (match cashier)
+  const [temperature, setTemperature] = useState("Iced");
   const [size, setSize] = useState("Medium");
   const [iceLevel, setIceLevel] = useState("Reg");
   const [sweetness, setSweetness] = useState("100%");
@@ -47,6 +48,15 @@ export default function CustomizePage() {
     Medium: 0.5,
     Large: 1,
   };
+  const temperatureOptions = ["Iced", "Hot"];
+
+  useEffect(() => {
+    if (drink && drink.category === "Milk Tea" && temperature === "Hot") {
+      setIceLevel("");
+    } else if (!iceLevel) {
+      setIceLevel("Reg");
+    }
+  }, [drink, temperature, iceLevel]);
 
   const sweetnessOptions = ["100%", "80%", "50%", "30%", "0%", "120%"];
 
@@ -108,6 +118,7 @@ export default function CustomizePage() {
       imagePath: drink.drink_image_path || drink.imagePath,
       unitPrice,
       quantity: 1,
+      temperature: drink.category === "Milk Tea" ? temperature : undefined,
       size,
       iceLevel: iceLevel,
       sweetness: sweetness,
@@ -119,6 +130,7 @@ export default function CustomizePage() {
     addToCart(cartItem);
 
     // Reset to defaults after adding
+    setTemperature("Iced");
     setSize("Medium");
     setIceLevel("Reg");
     setSweetness("100%");
@@ -129,12 +141,38 @@ export default function CustomizePage() {
     <div className="kiosk-page">
       <KioskHeader />
 
-      <h2>
-        <TranslatedText text={"Customize Your Drink"} /> —{" "}
-        <TranslatedText text={drink.drink_name || drink.name} />
-      </h2>
+      <div className="customize-title">
+        <div className="customize-title-label">
+          <TranslatedText text={"Customize Your Drink"} />
+        </div>
+        <div className="customize-drink-name">
+          <TranslatedText text={drink.drink_name || drink.name} />
+        </div>
+      </div>
 
       <div className="kiosk-options">
+        {drink.category === "Milk Tea" && (
+          <section>
+            <h3>
+              <TranslatedText text={"Temperature"} />
+            </h3>
+            <div className="option-grid">
+              {temperatureOptions.map((option) => (
+                <SpeakOnHover text={option} key={option}>
+                  <button
+                    className={`option-btn ${
+                      temperature === option ? "selected" : ""
+                    }`}
+                    onClick={() => setTemperature(option)}
+                  >
+                    <TranslatedText text={option} />
+                  </button>
+                </SpeakOnHover>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Size Section */}
         <section>
           <h3>
@@ -155,25 +193,27 @@ export default function CustomizePage() {
         </section>
 
         {/* Ice Level Section */}
-        <section>
-          <h3>
-            <TranslatedText text={"Ice Level"} />
-          </h3>
-          <div className="option-grid">
-            {iceOptions.map((option) => (
-              <SpeakOnHover text={option.display} key={option.value}>
-                <button
-                  className={`option-btn ${
-                    iceLevel === option.value ? "selected" : ""
-                  }`}
-                  onClick={() => setIceLevel(option.value)}
-                >
-                  <TranslatedText text={option.display} />
-                </button>
-              </SpeakOnHover>
-            ))}
-          </div>
-        </section>
+        {!(drink.category === "Milk Tea" && temperature === "Hot") && (
+          <section>
+            <h3>
+              <TranslatedText text={"Ice Level"} />
+            </h3>
+            <div className="option-grid">
+              {iceOptions.map((option) => (
+                <SpeakOnHover text={option.display} key={option.value}>
+                  <button
+                    className={`option-btn ${
+                      iceLevel === option.value ? "selected" : ""
+                    }`}
+                    onClick={() => setIceLevel(option.value)}
+                  >
+                    <TranslatedText text={option.display} />
+                  </button>
+                </SpeakOnHover>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Sweetness Level Section */}
         <section>

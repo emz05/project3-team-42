@@ -21,6 +21,7 @@ export const CartProvider = ({ children }) => {
       const existingIndex = cart.findIndex(
         (cartItem) =>
           cartItem.drinkId === item.drinkId &&
+          cartItem.temperature === item.temperature &&
           cartItem.size === item.size &&
           cartItem.iceLevel === item.iceLevel &&
           cartItem.sweetness === item.sweetness &&
@@ -90,6 +91,7 @@ export const CartProvider = ({ children }) => {
           (item) =>
             !(
               item.drinkId === updatedItem.drinkId &&
+              item.temperature === updatedItem.temperature &&
               item.size === updatedItem.size &&
               item.iceLevel === updatedItem.iceLevel &&
               item.sweetness === updatedItem.sweetness &&
@@ -100,13 +102,14 @@ export const CartProvider = ({ children }) => {
       setCart(filteredCart);
     } else {
         const updatedCart = cart.map((item) => {
-          const isSameItem =
-            item.drinkId === updatedItem.drinkId &&
-            item.size === updatedItem.size &&
-            item.iceLevel === updatedItem.iceLevel &&
-            item.sweetness === updatedItem.sweetness &&
-            JSON.stringify(item.toppings?.sort()) ===
-              JSON.stringify(updatedItem.toppings?.sort());
+        const isSameItem =
+          item.drinkId === updatedItem.drinkId &&
+          item.temperature === updatedItem.temperature &&
+          item.size === updatedItem.size &&
+          item.iceLevel === updatedItem.iceLevel &&
+          item.sweetness === updatedItem.sweetness &&
+          JSON.stringify(item.toppings?.sort()) ===
+            JSON.stringify(updatedItem.toppings?.sort());
 
         if (isSameItem) {
           const newTotalPrice = updatedItem.unitPrice * updatedItem.quantity;

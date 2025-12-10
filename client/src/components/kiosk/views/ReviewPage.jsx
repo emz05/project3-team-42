@@ -85,6 +85,10 @@ export default function ReviewPage() {
       Milk: "Condensed Milk",
     };
 
+    if (item.temperature) {
+      customizations.push(item.temperature);
+    }
+
     const displayIceLevel = iceLevelMap[item.iceLevel] || item.iceLevel;
 
     if (item.iceLevel && item.iceLevel !== "Reg") {
