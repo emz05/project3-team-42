@@ -7,10 +7,18 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
     const [iceLevel, setIceLevel] = useState('Regular Ice');
     const [sweetness, setSweetness] = useState('100%');
     const [toppings, setToppings] = useState([]);
+    const [size, setSize] = useState('Medium');
 
+    const sizeOptions = ['Small', 'Medium', 'Large'];
     const iceOptions = ['Regular Ice', 'Light Ice', 'No Ice', 'Extra Ice'];
     const sweetnessOptions = ['100%', '80%', '50%', '30%', '0%', '120%'];
     const toppingOptions = ['Boba', 'Jelly', 'Ice Cream', 'Condensed Milk'];
+
+    const sizeUpcharge = {
+        Small: 0,
+        Medium: 0.5,
+        Large: 1,
+    };
 
     // Add or remove a topping
     const toggleTopping = (topping) => {
@@ -27,20 +35,26 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
     // Build the cart item and add it
     const handleAdd = () => {
+        const basePrice = Number(drink.price) || 0;
+        const unitPrice = basePrice + (sizeUpcharge[size] || 0);
+
         const cartItem = {
             drinkId: drink.id,
             drinkName: drink.name,
             imagePath: drink.imagePath,
-            unitPrice: drink.price,
+            unitPrice,
             quantity: 1,
+            size,
             iceLevel: iceLevel,
             sweetness: sweetness,
             toppings: toppings,
-            totalPrice: drink.price
+            totalPrice: unitPrice
         };
 
         onAdd(cartItem);
         onClose();
+
+        setSize('Medium');
     };
 
     // close customizations panel on background selection
@@ -84,6 +98,27 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
                 {/* Customization options */}
                 <div className="panel-body">
+
+                    {/* Size Section */}
+                    <section className="customization-section">
+                        <h3 className="section-title"><TranslatedText text={'Size'}/></h3>
+                        <div className="option-grid">
+                            {sizeOptions.map(option => {
+                                const isSelected = size === option;
+
+                                let buttonClass = 'option-btn';
+                                if (isSelected) {
+                                    buttonClass = 'option-btn selected';
+                                }
+
+                                return (
+                                    <button key={option} className={buttonClass} onClick={() => setSize(option)}>
+                                        <TranslatedText text={option}/>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </section>
 
                     {/* Ice Level Section */}
                     <section className="customization-section">

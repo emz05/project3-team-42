@@ -167,6 +167,7 @@ const OrderPanel = () => {
         // Check if item with same customizations already exists
         const existingIndex = cartItems.findIndex(item =>
             item.drinkId === cartItem.drinkId &&
+            item.size === cartItem.size &&
             item.iceLevel === cartItem.iceLevel &&
             item.sweetness === cartItem.sweetness &&
             JSON.stringify(item.toppings) === JSON.stringify(cartItem.toppings)
@@ -195,6 +196,7 @@ const OrderPanel = () => {
             const filteredCart = cartItems.filter(item =>
                 !(
                     item.drinkId === updatedItem.drinkId &&
+                    item.size === updatedItem.size &&
                     item.iceLevel === updatedItem.iceLevel &&
                     item.sweetness === updatedItem.sweetness &&
                     JSON.stringify(item.toppings) === JSON.stringify(updatedItem.toppings)
@@ -205,6 +207,7 @@ const OrderPanel = () => {
             const updatedCart = cartItems.map(item => {
                 const isSameItem =
                     item.drinkId === updatedItem.drinkId &&
+                    item.size === updatedItem.size &&
                     item.iceLevel === updatedItem.iceLevel &&
                     item.sweetness === updatedItem.sweetness &&
                     JSON.stringify(item.toppings) === JSON.stringify(updatedItem.toppings);
@@ -373,12 +376,13 @@ const OrderPanel = () => {
         }
 
         try{
-            const orderData = {
+                const orderData = {
                 employeeID: employee.id,
                 cartCards: cartItems.map(obj => ({
                     drinkID: obj.drinkId,
                     quantity: obj.quantity,
                     totalPrice: obj.totalPrice,
+                    size: obj.size,
                     iceLevel: obj.iceLevel,
                     sweetness: obj.sweetness,
                     toppings: obj.toppings

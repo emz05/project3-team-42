@@ -33,6 +33,10 @@ const CartCard = ({ item, onUpdate }) => {
     const buildCustomizationText = () => {
         const customizations = [];
 
+        if (item.size) {
+            customizations.push(item.size);
+        }
+
         if (item.iceLevel && item.iceLevel !== 'Regular Ice') {
             customizations.push(item.iceLevel);
         }

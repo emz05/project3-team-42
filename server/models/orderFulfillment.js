@@ -11,6 +11,11 @@ async function fulfillCartItem(item, receiptId, connection) {
     let toppingsValue = item.toppings;
     if (Array.isArray(item.toppings)) { toppingsValue = item.toppings.join(', '); }
 
+    // Include drink size in the stored customizations without affecting inventory updates
+    const toppingsWithSize = item.size
+        ? `Size: ${item.size}${toppingsValue ? ` | ${toppingsValue}` : ''}`
+        : toppingsValue;
+
     await Orders.addOrderItem(
         receiptId,
         item.drinkID,
@@ -18,7 +23,7 @@ async function fulfillCartItem(item, receiptId, connection) {
         item.totalPrice,
         item.iceLevel,
         item.sweetness,
-        toppingsValue,
+        toppingsWithSize,
         connection
     );
 
