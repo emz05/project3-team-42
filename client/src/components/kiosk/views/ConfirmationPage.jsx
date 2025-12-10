@@ -160,7 +160,7 @@ export default function ConfirmationPage() {
             </h3>
 
             {hasProfilePhone && (
-              <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+              <p style={{ marginTop: "10px", fontWeight: "bold", textAlign: "center"}}>
                 {formatPhoneDisplay(profilePhone)}
               </p>
             )}

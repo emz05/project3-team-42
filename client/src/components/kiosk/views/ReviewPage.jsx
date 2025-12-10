@@ -65,6 +65,10 @@ export default function ReviewPage() {
   const buildCustomizationText = (item) => {
     const customizations = [];
 
+    if (item.size) {
+      customizations.push(item.size);
+    }
+
     // Map short ice level codes to display text
     const iceLevelMap = {
       Reg: "Regular Ice",
@@ -80,6 +84,10 @@ export default function ReviewPage() {
       IceC: "Ice Cream",
       Milk: "Condensed Milk",
     };
+
+    if (item.temperature) {
+      customizations.push(item.temperature);
+    }
 
     const displayIceLevel = iceLevelMap[item.iceLevel] || item.iceLevel;
 

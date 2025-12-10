@@ -15,7 +15,7 @@ const SlideTabs = ({ activeCategory, onCategoryChange }) => {
         opacity: 0,
     });
 
-    const categories = ['Milk Tea', 'Fruit', 'Blended'];
+    const categories = ['Milk Tea', 'Fruit', 'Blended', 'Seasonal'];
 
     const handleMouseLeave = () => {
         setPosition({

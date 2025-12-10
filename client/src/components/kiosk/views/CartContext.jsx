@@ -16,15 +16,17 @@ export const CartProvider = ({ children }) => {
   const [lastOrderInfo, setLastOrderInfo] = useState(null);
 
   // Add item to cart - merge if same customizations exist (match cashier)
-  const addToCart = (item) => {
-    // Check if item with same customizations already exists
-    const existingIndex = cart.findIndex(
-      (cartItem) =>
-        cartItem.drinkId === item.drinkId &&
-        cartItem.iceLevel === item.iceLevel &&
-        cartItem.sweetness === item.sweetness &&
-        JSON.stringify(cartItem.toppings?.sort()) === JSON.stringify(item.toppings?.sort())
-    );
+    const addToCart = (item) => {
+      // Check if item with same customizations already exists
+      const existingIndex = cart.findIndex(
+        (cartItem) =>
+          cartItem.drinkId === item.drinkId &&
+          cartItem.temperature === item.temperature &&
+          cartItem.size === item.size &&
+          cartItem.iceLevel === item.iceLevel &&
+          cartItem.sweetness === item.sweetness &&
+          JSON.stringify(cartItem.toppings?.sort()) === JSON.stringify(item.toppings?.sort())
+      );
 
     const itemExists = existingIndex >= 0;
 
@@ -85,21 +87,25 @@ export const CartProvider = ({ children }) => {
     const shouldRemove = updatedItem.quantity === 0;
 
     if (shouldRemove) {
-      const filteredCart = cart.filter(
-        (item) =>
-          !(
-            item.drinkId === updatedItem.drinkId &&
-            item.iceLevel === updatedItem.iceLevel &&
-            item.sweetness === updatedItem.sweetness &&
-            JSON.stringify(item.toppings?.sort()) ===
-              JSON.stringify(updatedItem.toppings?.sort())
-          )
+        const filteredCart = cart.filter(
+          (item) =>
+            !(
+              item.drinkId === updatedItem.drinkId &&
+              item.temperature === updatedItem.temperature &&
+              item.size === updatedItem.size &&
+              item.iceLevel === updatedItem.iceLevel &&
+              item.sweetness === updatedItem.sweetness &&
+              JSON.stringify(item.toppings?.sort()) ===
+                JSON.stringify(updatedItem.toppings?.sort())
+            )
       );
       setCart(filteredCart);
     } else {
-      const updatedCart = cart.map((item) => {
+        const updatedCart = cart.map((item) => {
         const isSameItem =
           item.drinkId === updatedItem.drinkId &&
+          item.temperature === updatedItem.temperature &&
+          item.size === updatedItem.size &&
           item.iceLevel === updatedItem.iceLevel &&
           item.sweetness === updatedItem.sweetness &&
           JSON.stringify(item.toppings?.sort()) ===

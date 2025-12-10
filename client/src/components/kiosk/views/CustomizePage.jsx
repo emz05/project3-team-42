@@ -29,6 +29,8 @@ export default function CustomizePage() {
   const [drink, setDrink] = useState(null);
 
   // Default customization states (match cashier)
+  const [temperature, setTemperature] = useState("Iced");
+  const [size, setSize] = useState("Medium");
   const [iceLevel, setIceLevel] = useState("Reg");
   const [sweetness, setSweetness] = useState("100%");
   const [toppings, setToppings] = useState([]);
@@ -40,6 +42,21 @@ export default function CustomizePage() {
     { display: "No Ice", value: "No" },
     { display: "Extra Ice", value: "Ext" },
   ];
+  const sizeOptions = ["Small", "Medium", "Large"];
+  const sizeUpcharge = {
+    Small: 0,
+    Medium: 0.5,
+    Large: 1,
+  };
+  const temperatureOptions = ["Iced", "Hot"];
+
+  useEffect(() => {
+    if (drink && drink.category === "Milk Tea" && temperature === "Hot") {
+      setIceLevel("");
+    } else if (!iceLevel) {
+      setIceLevel("Reg");
+    }
+  }, [drink, temperature, iceLevel]);
 
   const sweetnessOptions = ["100%", "80%", "50%", "30%", "0%", "120%"];
 
@@ -92,22 +109,29 @@ export default function CustomizePage() {
 
   // Add to cart - match cashier structure exactly
   const handleAddToCart = () => {
+    const basePrice = Number(drink.drink_price || drink.price || 0);
+    const unitPrice = basePrice + (sizeUpcharge[size] || 0);
+
     const cartItem = {
       drinkId: drink.id,
       drinkName: drink.drink_name || drink.name,
       imagePath: drink.drink_image_path || drink.imagePath,
-      unitPrice: drink.drink_price || drink.price,
+      unitPrice,
       quantity: 1,
+      temperature: drink.category === "Milk Tea" ? temperature : undefined,
+      size,
       iceLevel: iceLevel,
       sweetness: sweetness,
       toppings: toppings.map((t) => t.value), // abbreviated values for DB
       toppingDisplayNames: toppings.map((t) => t.display), // display names for UI
-      totalPrice: drink.drink_price || drink.price,
+      totalPrice: unitPrice,
     };
 
     addToCart(cartItem);
 
     // Reset to defaults after adding
+    setTemperature("Iced");
+    setSize("Medium");
     setIceLevel("Reg");
     setSweetness("100%");
     setToppings([]);
@@ -117,32 +141,79 @@ export default function CustomizePage() {
     <div className="kiosk-page">
       <KioskHeader />
 
-      <h2>
-        <TranslatedText text={"Customize Your Drink"} /> —{" "}
-        <TranslatedText text={drink.drink_name || drink.name} />
-      </h2>
+      <div className="customize-title">
+        <div className="customize-title-label">
+          <TranslatedText text={"Customize Your Drink"} />
+        </div>
+        <div className="customize-drink-name">
+          <TranslatedText text={drink.drink_name || drink.name} />
+        </div>
+      </div>
 
       <div className="kiosk-options">
-        {/* Ice Level Section */}
+        {drink.category === "Milk Tea" && (
+          <section>
+            <h3>
+              <TranslatedText text={"Temperature"} />
+            </h3>
+            <div className="option-grid">
+              {temperatureOptions.map((option) => (
+                <SpeakOnHover text={option} key={option}>
+                  <button
+                    className={`option-btn ${
+                      temperature === option ? "selected" : ""
+                    }`}
+                    onClick={() => setTemperature(option)}
+                  >
+                    <TranslatedText text={option} />
+                  </button>
+                </SpeakOnHover>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Size Section */}
         <section>
           <h3>
-            <TranslatedText text={"Ice Level"} />
+            <TranslatedText text={"Size"} />
           </h3>
           <div className="option-grid">
-            {iceOptions.map((option) => (
-              <SpeakOnHover text={option.display} key={option.value}>
+            {sizeOptions.map((option) => (
+              <SpeakOnHover text={option} key={option}>
                 <button
-                  className={`option-btn ${
-                    iceLevel === option.value ? "selected" : ""
-                  }`}
-                  onClick={() => setIceLevel(option.value)}
+                  className={`option-btn ${size === option ? "selected" : ""}`}
+                  onClick={() => setSize(option)}
                 >
-                  <TranslatedText text={option.display} />
+                  <TranslatedText text={option} />
                 </button>
               </SpeakOnHover>
             ))}
           </div>
         </section>
+
+        {/* Ice Level Section */}
+        {!(drink.category === "Milk Tea" && temperature === "Hot") && (
+          <section>
+            <h3>
+              <TranslatedText text={"Ice Level"} />
+            </h3>
+            <div className="option-grid">
+              {iceOptions.map((option) => (
+                <SpeakOnHover text={option.display} key={option.value}>
+                  <button
+                    className={`option-btn ${
+                      iceLevel === option.value ? "selected" : ""
+                    }`}
+                    onClick={() => setIceLevel(option.value)}
+                  >
+                    <TranslatedText text={option.display} />
+                  </button>
+                </SpeakOnHover>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Sweetness Level Section */}
         <section>
