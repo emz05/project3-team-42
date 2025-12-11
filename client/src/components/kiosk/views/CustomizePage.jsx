@@ -140,7 +140,6 @@ export default function CustomizePage() {
   return (
     <div className="kiosk-page">
       <KioskHeader />
-
       <div className="customize-title">
         <div className="customize-title-label">
           <TranslatedText text={"Customize Your Drink"} />
@@ -151,6 +150,25 @@ export default function CustomizePage() {
       </div>
 
       <div className="kiosk-options">
+          {/* Size Section */}
+          <section>
+              <h3>
+                  <TranslatedText text={"Size"} />
+              </h3>
+              <div className="option-grid">
+                  {sizeOptions.map((option) => (
+                      <SpeakOnHover text={option} key={option}>
+                          <button
+                              className={`option-btn ${size === option ? "selected" : ""}`}
+                              onClick={() => setSize(option)}
+                          >
+                              <TranslatedText text={option} />
+                          </button>
+                      </SpeakOnHover>
+                  ))}
+              </div>
+          </section>
+
         {drink.category === "Milk Tea" && (
           <section>
             <h3>
@@ -172,25 +190,6 @@ export default function CustomizePage() {
             </div>
           </section>
         )}
-
-        {/* Size Section */}
-        <section>
-          <h3>
-            <TranslatedText text={"Size"} />
-          </h3>
-          <div className="option-grid">
-            {sizeOptions.map((option) => (
-              <SpeakOnHover text={option} key={option}>
-                <button
-                  className={`option-btn ${size === option ? "selected" : ""}`}
-                  onClick={() => setSize(option)}
-                >
-                  <TranslatedText text={option} />
-                </button>
-              </SpeakOnHover>
-            ))}
-          </div>
-        </section>
 
         {/* Ice Level Section */}
         {!(drink.category === "Milk Tea" && temperature === "Hot") && (
