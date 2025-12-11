@@ -2,6 +2,7 @@ import React from "react";
 import TextToSpeechToggle from "./TextToSpeechToggle.jsx";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import ContrastToggle from "../views/ContrastToggle.jsx";
+import MagnifierToggle from "../../common/MagnifierToggle.jsx";
 
 import "../css/kiosk-header.css";
 
@@ -22,10 +23,11 @@ export default function KioskHeader() {
         <h2>Accessibility</h2>
       </div>
 
-      {/* Right: Language + TTS */}
+      {/* Right: Language + TTS + Magnifier */}
       <div className="kiosk-header-right">
         <LanguageDropdown />
         <TextToSpeechToggle />
+        <MagnifierToggle />
       </div>
     </header>
   );

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import './css/manager-panel.css';
 import { managerAPI } from '../../services/api.js';
 import LanguageDropdown from "../common/LanguageDropdown.jsx";
+import MagnifierToggle from "../common/MagnifierToggle.jsx";
 import TranslatedText from "../common/TranslateText.jsx";
 import { useTranslation } from '../../context/translation-storage.jsx';
 import homeIcon from '../../assets/home.png';
@@ -356,6 +357,26 @@ const ReportCard = ({
             <strong>{report.last_transaction_time || '—'}</strong>
           </div>
         </div>
+        {Array.isArray(report.hourly_totals) && report.hourly_totals.length > 0 && (
+          <div className="payment-breakdown">
+            <div className="payment-heading">
+              <TranslatedText text="Hourly Totals" />
+            </div>
+            {report.hourly_totals.map((hourly) => {
+              const hourLabel = `${hourly.hour}:00`;
+              return (
+                <div className="payment-row bold" key={hourly.hour}>
+                  <span>{hourLabel}</span>
+                  <span>
+                    {formatNumber(hourly.total_orders)}{' '}
+                    <TranslatedText text="orders" />
+                  </span>
+                  <strong>{formatCurrency(hourly.total_sales)}</strong>
+                </div>
+              );
+            })}
+          </div>
+        )}
         <div className="payment-breakdown">
           <div className="payment-heading">
             <TranslatedText text="Payment Mix" />
@@ -423,7 +444,6 @@ const tabs = [
 const ManagerPanel = () => {
   const navigate = useNavigate();
   const { translate } = useTranslation();
-  const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [weather, setWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -711,15 +731,30 @@ const ManagerPanel = () => {
   } = dashboardData;
 
   const canRunReport = (type) => {
-    const lastRun = reportRunState[type];
-    return !lastRun || lastRun !== getTodayKey();
+    // X report can be run multiple times per day
+    if (type === 'x') {
+      return true;
+    }
+    // Z report can only be run once per day
+    if (type === 'z') {
+      const lastRun = reportRunState[type];
+      return !lastRun || lastRun !== getTodayKey();
+    }
+    return true;
   };
 
   const handleRunReport = async (type) => {
     if (!canRunReport(type)) return;
     await loadDashboard();
-    const today = getTodayKey();
-    setReportRunState((prev) => ({ ...prev, [type]: today }));
+    // Only track Z report runs (X report can run multiple times)
+    if (type === 'z') {
+      const today = getTodayKey();
+      setReportRunState((prev) => ({ ...prev, [type]: today }));
+    } else if (type === 'x') {
+      // Update last run date for X report display, but allow multiple runs
+      const today = getTodayKey();
+      setReportRunState((prev) => ({ ...prev, [type]: today }));
+    }
   };
 
   const handleDeleteDrink = async () => {
@@ -882,16 +917,18 @@ const ManagerPanel = () => {
     }
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem('managerAuthUser');
+    navigate('/home');
+  };
+
   return (
     <div className="manager-container">
-      <aside className={collapsed ? 'sidebar collapsed' : 'sidebar'}>
+      <aside className="sidebar">
         <div className="sidebar-header">
           <div className="brand">
             <TranslatedText text="Manager" />
           </div>
-          <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? '›' : '‹'}
-          </button>
         </div>
         <nav className="menu">
           {tabs.map((t) => (
@@ -923,38 +960,48 @@ const ManagerPanel = () => {
                 className="home-icon"
               />
             </button>
-            {!collapsed && (
-              <div className="weather-container">
-                {weatherLoading ? (
-                  <div className="weather-loading">
-                    <TranslatedText text="Loading weather..." />
+            <div className="weather-container">
+              {weatherLoading ? (
+                <div className="weather-loading">
+                  <TranslatedText text="Loading weather..." />
+                </div>
+              ) : weatherError ? (
+                <div className="weather-error">
+                  <TranslatedText text="Weather unavailable" />
+                </div>
+              ) : weather ? (
+                <div className="weather-display">
+                  <div className="weather-temp">
+                    {Math.round(weather.temperature)}°F
                   </div>
-                ) : weatherError ? (
-                  <div className="weather-error">
-                    <TranslatedText text="Weather unavailable" />
-                  </div>
-                ) : weather ? (
-                  <div className="weather-display">
-                    <div className="weather-temp">
-                      {Math.round(weather.temperature)}°F
+                  <div className="weather-details">
+                    <div className="weather-wind">
+                      💨 {Math.round(weather.windspeed)} mph
                     </div>
-                    <div className="weather-details">
-                      <div className="weather-wind">
-                        💨 {Math.round(weather.windspeed)} mph
-                      </div>
-                      <div className="weather-code">
-                        <TranslatedText text={getWeatherDescription(weather.weathercode)} />
-                      </div>
+                    <div className="weather-code">
+                      <TranslatedText text={getWeatherDescription(weather.weathercode)} />
                     </div>
                   </div>
-                ) : null}
-              </div>
-            )}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </aside>
 
       <main className="content">
+        <header className="manager-header">
+          <div className="manager-language-dropdown-header">
+            <LanguageDropdown />
+            <MagnifierToggle />
+          </div>
+          <h1 className="manager-header-title">
+            <TranslatedText text="Manager View" />
+          </h1>
+          <button className="logout-btn" onClick={handleLogout}>
+            <TranslatedText text="Logout" />
+          </button>
+        </header>
         {/* DASHBOARD TAB */}
         {activeTab === 'Dashboard' && (
           <section className="dashboard-view">
@@ -974,15 +1021,12 @@ const ManagerPanel = () => {
               </div>
             )}
 
-            <div className="zoomViewport">
-              <div className="zoomContainer">
             <div className="dashboard-section sales-tall">
               <div className="section-heading">
                 <h2><TranslatedText text="Sales & Analytics" /></h2>
               </div>
               <div className="dashboard-grid charts">
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Weekly Sales Trend" subtitle="Orders per ISO week">
+                <ChartCard title="Weekly Sales Trend" subtitle="Orders per ISO week">
                     <VerticalBarChart
                       data={weeklyChartData}
                       labelKey="label"
@@ -991,9 +1035,7 @@ const ManagerPanel = () => {
                       valueFormatter={formatNumber}
                     />
                   </ChartCard>
-                </div>
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Hourly Orders" subtitle="Order count grouped by hour">
+                <ChartCard title="Hourly Orders" subtitle="Order count grouped by hour">
                   <SparklineChart data={hourlyOrdersData} labelKey="label" valueKey="value" />
                   <div className="chart-stats">
                     <div>
@@ -1010,10 +1052,8 @@ const ManagerPanel = () => {
                     </div>
                   </div>
                 </ChartCard>
-                </div>
 
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Peak Sales Day" subtitle="Top 10 orders summed per day">
+                <ChartCard title="Peak Sales Day" subtitle="Top 10 orders summed per day">
                   {dashboardLoading && !peakDay ? (
                     <div className="muted"><TranslatedText text="Loading…" /></div>
                   ) : peakDay ? (
@@ -1042,7 +1082,6 @@ const ManagerPanel = () => {
                     <div className="muted"><TranslatedText text="No peak day identified" /></div>
                   )}
                 </ChartCard>
-                </div>
               </div>
             </div>
 
@@ -1051,8 +1090,7 @@ const ManagerPanel = () => {
                 <h2><TranslatedText text="Drink Performance" /></h2>
               </div>
               <div className="dashboard-grid charts">
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Drinks per Category">
+                <ChartCard title="Drinks per Category">
                   <VerticalBarChart
                     data={drinkCountChartData}
                     labelKey="label"
@@ -1060,9 +1098,7 @@ const ManagerPanel = () => {
                     valueFormatter={formatNumber}
                   />
                 </ChartCard>
-                </div>
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Orders per Category">
+                <ChartCard title="Orders per Category">
                   <VerticalBarChart
                     data={ordersPerCategoryData}
                     labelKey="label"
@@ -1070,9 +1106,7 @@ const ManagerPanel = () => {
                     valueFormatter={formatNumber}
                   />
                 </ChartCard>
-                </div>
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Sales per Drink">
+                <ChartCard title="Sales per Drink">
                   <HorizontalBarChart
                     data={salesPerDrinkChartData}
                     labelKey="label"
@@ -1082,7 +1116,6 @@ const ManagerPanel = () => {
                     accent
                   />
                 </ChartCard>
-                </div>
               </div>
             </div>
 
@@ -1091,8 +1124,7 @@ const ManagerPanel = () => {
                 <h2><TranslatedText text="Team Performance" /></h2>
               </div>
               <div className="dashboard-grid charts">
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ChartCard title="Orders & Revenue per Employee">
+                <ChartCard title="Orders & Revenue per Employee">
                   <DualHorizontalBarChart
                     data={employeePerformanceData}
                     labelKey="label"
@@ -1102,9 +1134,7 @@ const ManagerPanel = () => {
                     secondaryLabel="Revenue"
                   />
                 </ChartCard>
-                </div>
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <div className="card table-card full-height">
+                <div className="card table-card full-height">
                   <div className="card-title">
                     <TranslatedText text="Employee Roster" />
                   </div>
@@ -1135,7 +1165,6 @@ const ManagerPanel = () => {
                     </table>
                   </div>
                 </div>
-                </div>
               </div>
             </div>
 
@@ -1143,11 +1172,9 @@ const ManagerPanel = () => {
               <div className="section-heading">
                 <h2><TranslatedText text="Inventory" /></h2>
               </div>
-              <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
                 <ChartCard title="Low Stock Inventory">
                 <LowStockChart data={lowStockInventory} />
               </ChartCard>
-              </div>
             </div>
 
             <div className="dashboard-section">
@@ -1155,8 +1182,7 @@ const ManagerPanel = () => {
                 <h2><TranslatedText text="Financial & POS Reports" /></h2>
               </div>
               <div className="dashboard-grid charts">
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <div className="card metric-card focal">
+                <div className="card metric-card focal">
                   <div className="card-title">
                     <TranslatedText text="Highest Receipt Amount" />
                   </div>
@@ -1177,9 +1203,7 @@ const ManagerPanel = () => {
                     <div className="muted"><TranslatedText text="No receipts yet" /></div>
                   )}
                 </div>
-                </div>
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ReportCard
+                <ReportCard
                   title="X-Report"
                   report={xReport}
                   loading={dashboardLoading}
@@ -1187,9 +1211,7 @@ const ManagerPanel = () => {
                   canRun={canRunReport('x')}
                   lastRunDate={reportRunState.x}
                 />
-                </div>
-                <div className="zoomTarget" data-closeclick="true" data-targetsize="0.7" data-duration="600">
-                  <ReportCard
+                <ReportCard
                   title="Z-Report"
                   report={zReport}
                   loading={dashboardLoading}
@@ -1197,9 +1219,6 @@ const ManagerPanel = () => {
                   canRun={canRunReport('z')}
                   lastRunDate={reportRunState.z}
                 />
-                </div>
-              </div>
-            </div>
               </div>
             </div>
           </section>

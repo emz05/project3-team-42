@@ -1,0 +1,8 @@
+/* MagnifyingGlass.css - Styles for the magnifying glass component */
+/* Note: No visual element is rendered - only scaling functionality is used */
+
+/* Keep normal cursor when magnifier is enabled */
+body.magnifier-enabled {
+  cursor: default;
+}
+

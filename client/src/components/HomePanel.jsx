@@ -20,32 +20,29 @@ const HomePanel = () => {
     return (
         <div className="button-container">
             {/* Navigation buttons for each user role */}
-            <div className="admin-button">
-                <button 
-                    onClick={() => navigate('/manager')}
-                    style={{ fontSize: '1.5em', fontWeight: 'bold' }}
-                >
-                    <TranslatedText text={"Admin"} />
-                </button>
-            </div>
+            <button 
+                className="admin-button"
+                onClick={() => navigate('/manager')}
+                style={{ fontSize: '1.5em', fontWeight: 'bold' }}
+            >
+                <TranslatedText text={"Admin"} />
+            </button>
 
-            <div className="cashier-button">
-                <button 
-                    onClick={() => navigate('/cashier/login')}
-                    style={{ fontSize: '1.5em', fontWeight: 'bold' }}
-                >
-                    <TranslatedText text={"Cashier"} />
-                </button>
-            </div>
+            <button 
+                className="cashier-button"
+                onClick={() => navigate('/cashier/login')}
+                style={{ fontSize: '1.5em', fontWeight: 'bold' }}
+            >
+                <TranslatedText text={"Cashier"} />
+            </button>
 
-            <div className="kiosk-button">
-                <button
-                    onClick={() => navigate('/kiosk')}
-                    style={{ fontSize: '1.5em', fontWeight: 'bold' }}
-                >
-                    <TranslatedText text={"Kiosk"} />
-                </button>
-            </div>
+            <button
+                className="kiosk-button"
+                onClick={() => navigate('/kiosk')}
+                style={{ fontSize: '1.5em', fontWeight: 'bold' }}
+            >
+                <TranslatedText text={"Kiosk"} />
+            </button>
 
             {/* Language selector shown on home screen */}
             <div className="language-dropdown">

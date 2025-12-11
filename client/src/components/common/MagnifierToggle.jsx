@@ -1,0 +1,38 @@
+// client/src/components/common/MagnifierToggle.jsx
+import React from 'react';
+import { useAccessibility } from '../../context/AccessibilityContext.jsx';
+
+const MagnifierToggle = () => {
+  const { magnifierEnabled, setMagnifierEnabled } = useAccessibility();
+
+  const handleChange = () => {
+    setMagnifierEnabled(!magnifierEnabled);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleChange}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.4rem',
+        padding: '0.4rem 0.6rem',
+        borderRadius: '999px',
+        border: '1px solid #ccc',
+        backgroundColor: magnifierEnabled ? '#e5f5ff' : '#f5f5f5',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+      }}
+      aria-label={magnifierEnabled ? 'Disable magnifying glass' : 'Enable magnifying glass'}
+    >
+      <span aria-hidden="true">
+        {magnifierEnabled ? '🔍' : '🔎'}
+      </span>
+      <span>Magnifier</span>
+    </button>
+  );
+};
+
+export default MagnifierToggle;
+
