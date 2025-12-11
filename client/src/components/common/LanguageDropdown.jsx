@@ -114,13 +114,13 @@ export default function LanguageDropdown({ className = "", label = "Select langu
       <button
         onClick={() => setIsOpen(!isOpen)}
         type="button"
-        className="bg-white rounded-full px-6 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center gap-3 hover:shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-shadow"
+        className="bg-white rounded-full px-6 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center gap-2 hover:shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-shadow text-sm"
       >
-        <GlobeIcon className="w-5 h-5 text-gray-700" />
-        <span className="font-medium text-gray-900">{selectedLanguage.language}</span>
-        <span className="text-gray-400 text-sm">{selectedLanguage.locale}</span>
+        <GlobeIcon className="w-4 h-4 text-gray-700" />
+        <span className="font-semibold text-gray-900 leading-tight">{selectedLanguage.language}</span>
+        <span className="text-gray-400 text-xs leading-tight">{selectedLanguage.locale}</span>
         <ChevronIcon
-          className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 

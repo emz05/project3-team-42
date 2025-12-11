@@ -19,12 +19,12 @@ const TextToSpeechToggle = () => {
       type="button"
       onClick={handleChange}
       disabled={!ttsSupported}
-      className={`bg-white rounded-full px-6 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center gap-2 transition-shadow text-sm
+      className={`bg-white rounded-full px-6 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center gap-2 transition-shadow text-sm font-semibold text-gray-800
         ${ttsEnabled ? 'ring-2 ring-indigo-500/60' : ''}
         ${ttsSupported ? 'hover:shadow-lg cursor-pointer' : 'opacity-60 cursor-not-allowed'}`}
     >
       <span aria-hidden="true">
-        {ttsEnabled ? '🔊' : '🔈'}
+        {ttsEnabled ? '􀊦' : '􀊦'}
       </span>
       <span>{label}</span>
     </button>

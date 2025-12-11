@@ -71,61 +71,30 @@
 
 .manager-language-dropdown {
   padding: 8px 12px;
-  border-top: 1px solid #f0f0f0;
+  margin-left: 40px;
 }
 
 .manager-home-button {
   padding: 8px 12px;
-  border-top: 1px solid #f0f0f0;
 }
-
-.home-weather-row {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-}
-
-.home-button {
-  flex: 0 0 auto;
-  border: 1px solid #ffffff;
-  background: #ffffff;
-  color: #1f2937;
-  padding: 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  min-height: 40px;
-  min-width: 40px;
-}
-
-.home-button:hover {
-  background: #f9fafb;
-  border-color: #f3b5ad;
-}
-
-.home-icon {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
 
 .weather-container {
   flex: 1;
   min-height: 40px;
   padding: 10px;
-  border-radius: 8px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
   justify-content: center;
+    margin-bottom: 30px;
+}
+
+.pill-style {
+  padding: 12px 16px;
+  gap: 6px;
 }
 
 .weather-loading,
@@ -200,25 +169,26 @@
 }
 
 .logout-btn {
-  background-color: #f3f4f6;
-  color: #6b7280;
-  font-size: 16px;
-  font-weight: 600;
-  padding: 10px 24px;
+  background-color: #ffffff;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   flex: 0 0 auto;
 }
 
 .logout-btn:hover {
-  background-color: #e5e7eb;
-  color: #1f2937;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  transform: translateY(-1px);
 }
 
 .logout-btn:active {
-  background-color: #d1d5db;
+  transform: translateY(0);
 }
 
 .content > *:not(.manager-header) {
