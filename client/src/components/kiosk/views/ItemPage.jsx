@@ -45,10 +45,11 @@ export default function ItemPage() {
       <KioskHeader />
 
       <div className="kiosk-container">
-        <h2>
-          <TranslatedText text={"Select a Drink"} /> —{" "}
+        <h1>
+          <TranslatedText text={"Select a Drink:  \n"}/>
+            &nbsp;
           <TranslatedText text={categoryId} />
-        </h2>
+        </h1>
 
         <div className="kiosk-drinks-list">
           {items.map((item) => {
@@ -81,31 +82,21 @@ export default function ItemPage() {
                     <h3 className="drink-item-name">
                       <TranslatedText text={drinkName} />
                     </h3>
-                    <p className="drink-item-price">{formattedPrice}</p>
+                    <p className="drink-item-prices">{formattedPrice}</p>
 
                     {/* Description preview or full */}
                     {description && (
                       <div className="drink-item-description">
-                        <p className={isExpanded ? "expanded" : "collapsed"}>
+                        <p className="expanded">
                           <TranslatedText text={description} />
                         </p>
-                        {description.length > 80 && (
-                          <button
-                            className="description-toggle"
-                            onClick={(e) => toggleDescription(item.id, e)}
-                          >
-                            <TranslatedText
-                              text={isExpanded ? "Show Less" : "Read More"}
-                            />
-                          </button>
-                        )}
                       </div>
                     )}
 
                     {/* Allergens */}
                     {allergens && (
                       <div className="drink-item-allergens">
-                        <span className="allergen-icon">⚠️</span>
+                        <span className="allergen-text">Allergens:</span>
                         <span className="allergen-text">
                           <TranslatedText text={allergens} />
                         </span>
@@ -119,7 +110,7 @@ export default function ItemPage() {
                       className="order-drink-button"
                       onClick={() => navigate(`/kiosk/item/${item.id}/customize`)}
                     >
-                      <TranslatedText text={"Order"} />
+                      <TranslatedText text={"􀁍"} />
                     </button>
                   </div>
                 </div>
