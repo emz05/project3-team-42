@@ -981,7 +981,7 @@ const ManagerPanel = () => {
       <main className="content">
         <header className="manager-header">
           <div className="manager-language-dropdown-header">
-            <LanguageDropdown />
+            <LanguageDropdown align="left" />
             <MagnifierToggle />
           </div>
           <h1 className="manager-header-title">

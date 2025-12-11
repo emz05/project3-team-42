@@ -87,7 +87,7 @@ function ChevronIcon({ className = "" }) {
   );
 }
 
-export default function LanguageDropdown({ className = "", label = "Select language" }) {
+export default function LanguageDropdown({ className = "", label = "Select language", align = "right" }) {
   const { language, setLanguage } = useTranslation();
   const allLanguages = useMemo(
     () => Object.values(LANGUAGES_BY_REGION).flat(),
@@ -125,7 +125,11 @@ export default function LanguageDropdown({ className = "", label = "Select langu
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-2 right-0 bg-white rounded-2xl shadow-2xl w-[min(70vw,38rem)] overflow-hidden border border-gray-200">
+        <div
+          className={`absolute z-[2000] mt-2 ${
+            align === "left" ? "left-0" : "right-0"
+          } bg-white rounded-2xl shadow-2xl w-[min(70vw,38rem)] overflow-hidden border border-gray-200`}
+        >
           <div className="border-b border-gray-200 flex">
             {Object.keys(LANGUAGES_BY_REGION).map((region) => (
               <button

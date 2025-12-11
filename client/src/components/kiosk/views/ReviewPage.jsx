@@ -279,7 +279,7 @@ export default function ReviewPage() {
                 style={{
                   marginTop: "30px",
                   paddingTop: "20px",
-                  borderTop: "2px solid #e5e7eb",
+
                 }}
               >
                 <div
@@ -321,7 +321,7 @@ export default function ReviewPage() {
                     display: "flex",
                     justifyContent: "space-between",
                     paddingTop: "20px",
-                    borderTop: "2px solid #e5e7eb",
+
                   }}
                 >
                   <span
