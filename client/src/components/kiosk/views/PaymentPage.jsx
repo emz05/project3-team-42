@@ -19,6 +19,8 @@ import '../css/contrast-toggle.css';
 import KioskHeader from '../components/KioskHeader.jsx';
 import SpeakOnHover from '../components/SpeakOnHover.jsx';
 import usePageSpeech from '../../../hooks/usePageSpeech.jsx';
+import { api } from "../../../services/api.js";
+
 
 const normalizeIceLevel = (value) => {
   if (!value) {
@@ -268,6 +270,8 @@ export default function PaymentPage() {
           totalPrice: Number(
             (Number(item.totalPrice ?? item.unitPrice ?? 0)).toFixed(2)
           ),
+          temperature: item.temperature,
+          size: item.size,
           iceLevel: to4(item.iceLevel),
           sweetness: to4(item.sweetness),
           toppings: Array.isArray(item.toppings)
@@ -286,36 +290,22 @@ export default function PaymentPage() {
       // Simulate payment processing delay (1.5 seconds for better UX)
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const res = await fetch('/api/cashier/process-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
-      });
-
-      const data = await res.json().catch(() => ({
-        success: false,
-        error: 'Invalid response from server',
-      }));
-
+      const { data } = await api.post('/cashier/process-order', orderData);
       console.log('Payment response:', data);
 
-      if (res.ok && data?.success) {
+      if (data?.success) {
         const cartSnapshot = snapshotCartForStorage(cart);
         const summaryItems = summarizeCartForReceipt(cartSnapshot);
-
         saveLastOrderInfo({
           receiptId: data.receiptID,
           totalAmount: Number(total.toFixed(2)),
           cart: cartSnapshot,
           items: summaryItems,
         });
-
         clearCart();
         navigate('/kiosk/confirmation');
       } else {
-        setError(
-          data?.details || data?.error || data?.message || 'Payment failed'
-        );
+        setError(data?.details || data?.error || data?.message || 'Payment failed');
       }
     } catch (err) {
       console.error('Payment error:', err);

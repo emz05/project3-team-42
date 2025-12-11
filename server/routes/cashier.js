@@ -61,7 +61,14 @@ router.get('/drinks', async (req, res) => {
 router.get('/drinks/:category', async(req, res) => {
     try{
         const { category } = req.params;
-        const drinks = await Drink.getDrinksByCategory(category);
+        const isSeasonal = category && category.toLowerCase() === 'seasonal';
+
+        const drinks = isSeasonal
+            ? (await pool.query(
+                'SELECT id, drink_name, drink_price, drink_image_path, category, is_seasonal FROM Drink WHERE is_seasonal = true ORDER BY id'
+              )).rows
+            : await Drink.getDrinksByCategory(category);
+
         const drinkObjects = drinks.map(drinkObj);
         res.json(drinkObjects);
     } catch (e){

@@ -1,3 +1,6 @@
+/*
+order status for processing payment transactions
+ */
 const Stripe = require('stripe');
 const pool = require('./database');
 const { insertPendingOrder, updatePaymentLink } = require('./models/pendingOrders');

@@ -1,4 +1,7 @@
 // client/src/hooks/usePageSpeech.jsx
+/*
+text to speech handler
+ */
 import { useEffect } from "react";
 import { useAccessibility } from "../context/AccessibilityContext.jsx";
 import { speakText, stopSpeech } from "../utils/textToSpeech.js";

@@ -1,3 +1,8 @@
+/*
+- updates pending order table
+- occurs when customer is inputting payment information
+- status has to be successful for receipt and orders table to be loaded
+ */
 const pool = require('../database');
 
 // sends pending order in db with pending status

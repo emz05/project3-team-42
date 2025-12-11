@@ -1,3 +1,7 @@
+/*
+- database connection to update customer information
+- beyond feature usage: allows viewing of past history upon phone number
+ */
 const pool = require('../database');
 
 function normalizePhone(value) {

@@ -8,9 +8,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "./CartContext.jsx";
-import { customerAPI } from "../../../services/api.js";
 import TranslatedText from "../../common/TranslateText.jsx";
 import KioskCart from "./KioskCart.jsx";
+import { api, customerAPI } from "../../../services/api.js";
+
 
 import "../css/main.css";
 import "../css/profile.css";
@@ -487,14 +488,11 @@ async function fetchDrinkDetails(drinkId) {
   }
 
   try {
-    const response = await fetch(`/api/kiosk/item/${drinkId}`);
-    if (!response.ok) {
-      return null;
-    }
-    return await response.json();
+      const { data } = await api.get(`/kiosk/item/${drinkId}`);
+      return data;
   } catch (error) {
-    console.error("Failed to fetch drink details", error);
-    return null;
+      console.error("Failed to fetch drink details", error);
+      return null;
   }
 }
 

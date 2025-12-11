@@ -7,10 +7,29 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
     const [iceLevel, setIceLevel] = useState('Regular Ice');
     const [sweetness, setSweetness] = useState('100%');
     const [toppings, setToppings] = useState([]);
+    const [size, setSize] = useState('Medium');
+    const [temperature, setTemperature] = useState('Iced');
 
+    const sizeOptions = ['Small', 'Medium', 'Large'];
     const iceOptions = ['Regular Ice', 'Light Ice', 'No Ice', 'Extra Ice'];
     const sweetnessOptions = ['100%', '80%', '50%', '30%', '0%', '120%'];
     const toppingOptions = ['Boba', 'Jelly', 'Ice Cream', 'Condensed Milk'];
+    const temperatureOptions = ['Iced', 'Hot'];
+
+    const sizeUpcharge = {
+        Small: 0,
+        Medium: 0.5,
+        Large: 1,
+    };
+
+    // If Hot is selected for Milk Tea, clear ice level and hide options
+    useEffect(() => {
+        if (drink.category === 'Milk Tea' && temperature === 'Hot') {
+            setIceLevel('');
+        } else if (!iceLevel) {
+            setIceLevel('Regular Ice');
+        }
+    }, [drink.category, temperature, iceLevel]);
 
     // Add or remove a topping
     const toggleTopping = (topping) => {
@@ -27,20 +46,28 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
 
     // Build the cart item and add it
     const handleAdd = () => {
+        const basePrice = Number(drink.price) || 0;
+        const unitPrice = basePrice + (sizeUpcharge[size] || 0);
+
         const cartItem = {
             drinkId: drink.id,
             drinkName: drink.name,
             imagePath: drink.imagePath,
-            unitPrice: drink.price,
+            unitPrice,
             quantity: 1,
+            size,
+            temperature: drink.category === 'Milk Tea' ? temperature : undefined,
             iceLevel: iceLevel,
             sweetness: sweetness,
             toppings: toppings,
-            totalPrice: drink.price
+            totalPrice: unitPrice
         };
 
         onAdd(cartItem);
         onClose();
+
+        setSize('Medium');
+        setTemperature('Iced');
     };
 
     // close customizations panel on background selection
@@ -85,12 +112,12 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
                 {/* Customization options */}
                 <div className="panel-body">
 
-                    {/* Ice Level Section */}
+                    {/* Size Section */}
                     <section className="customization-section">
-                        <h3 className="section-title"><TranslatedText text={'Ice Level'}/></h3>
+                        <h3 className="section-title"><TranslatedText text={'Size'}/></h3>
                         <div className="option-grid">
-                            {iceOptions.map(option => {
-                                const isSelected = isIceSelected(option);
+                            {sizeOptions.map(option => {
+                                const isSelected = size === option;
 
                                 let buttonClass = 'option-btn';
                                 if (isSelected) {
@@ -98,13 +125,58 @@ const CustomizationPanel = ({ drink, onClose, onAdd }) => {
                                 }
 
                                 return (
-                                    <button key={option} className={buttonClass} onClick={() => setIceLevel(option)}>
+                                    <button key={option} className={buttonClass} onClick={() => setSize(option)}>
                                         <TranslatedText text={option}/>
                                     </button>
                                 );
                             })}
                         </div>
                     </section>
+
+                    {drink.category === 'Milk Tea' && (
+                        <section className="customization-section">
+                            <h3 className="section-title"><TranslatedText text={'Temperature'}/></h3>
+                            <div className="option-grid">
+                                {temperatureOptions.map(option => {
+                                    const isSelected = temperature === option;
+
+                                    let buttonClass = 'option-btn';
+                                    if (isSelected) {
+                                        buttonClass = 'option-btn selected';
+                                    }
+
+                                    return (
+                                        <button key={option} className={buttonClass} onClick={() => setTemperature(option)}>
+                                            <TranslatedText text={option}/>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Ice Level Section (skip for hot Milk Tea) */}
+                    {!(drink.category === 'Milk Tea' && temperature === 'Hot') && (
+                        <section className="customization-section">
+                            <h3 className="section-title"><TranslatedText text={'Ice Level'}/></h3>
+                            <div className="option-grid">
+                                {iceOptions.map(option => {
+                                    const isSelected = isIceSelected(option);
+
+                                    let buttonClass = 'option-btn';
+                                    if (isSelected) {
+                                        buttonClass = 'option-btn selected';
+                                    }
+
+                                    return (
+                                        <button key={option} className={buttonClass} onClick={() => setIceLevel(option)}>
+                                            <TranslatedText text={option}/>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    )}
 
                     {/* Sweetness Level Section */}
                     <section className="customization-section">

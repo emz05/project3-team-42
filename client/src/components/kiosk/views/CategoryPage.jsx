@@ -16,6 +16,8 @@ import KioskHeader from "../components/KioskHeader.jsx";
 import SpeakOnHover from "../components/SpeakOnHover.jsx";
 import usePageSpeech from "../../../hooks/usePageSpeech.jsx";
 
+import { api } from "../../../services/api.js";
+
 export default function CategoryPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -24,9 +26,8 @@ export default function CategoryPage() {
   usePageSpeech("Select a drink category to get started.");
 
   useEffect(() => {
-    fetch("/api/kiosk/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data))
+      api.get("/kiosk/categories")
+      .then((res) => setCategories(res.data))
       .catch((err) => console.error("Failed to fetch categories:", err));
   }, []);
 

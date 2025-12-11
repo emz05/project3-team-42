@@ -1,3 +1,7 @@
+/*
+- all the routes on frontend
+- supports page changes through unique path names in frontend
+ */
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TranslationWrapper} from "./context/translation-storage.jsx";

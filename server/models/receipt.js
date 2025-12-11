@@ -1,3 +1,8 @@
+/*
+- database connection to collect data
+- data collected required for report handling
+- contains necessary info for z and x report
+ */
 const pool = require('../database');
 
 const buildDailyReport = async (date, connection = pool) => {

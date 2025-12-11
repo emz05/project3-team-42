@@ -1,10 +1,14 @@
+/*
+- connection from frontend to backend
+- facilitates requests and responses
+ */
 import axios from 'axios';
 
 // Use Vite proxy in development, or explicit URL if provided
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // axios instance for making API requests
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',

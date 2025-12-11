@@ -26,9 +26,10 @@ export default function KioskHomePage() {
       {/* Global header with contrast, language, TTS toggle */}
       <KioskHeader />
 
-      <div className="kiosk-welcome-container">
-        <h1><TranslatedText text={'Welcome!'}/></h1>
-        <p><TranslatedText text={'Tap to begin your order'}/></p>
+      <main role="main" aria-labelledby="kiosk-home-title">
+        <div className="kiosk-welcome-container">
+          <h1 id="kiosk-home-title"><TranslatedText text={'Welcome!'}/></h1>
+          <p><TranslatedText text={'Tap to begin your order'}/></p>
 
         {/* Start kiosk ordering flow */}
         <SpeakOnHover text="Start Order">
@@ -40,7 +41,8 @@ export default function KioskHomePage() {
           </button>
         </SpeakOnHover>
 
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
