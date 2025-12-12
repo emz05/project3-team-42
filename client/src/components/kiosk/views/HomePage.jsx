@@ -40,8 +40,14 @@ export default function KioskHomePage() {
             <TranslatedText text={'Start Order'}/>
           </button>
         </SpeakOnHover>
+            <p style={{ fontSize: "14px", color: "#4b5563", marginTop: "8px" }}>
+                <TranslatedText text={'􀇾 Card payments only'} />
+            </p>
+
+
 
         </div>
+
       </main>
     </div>
   );

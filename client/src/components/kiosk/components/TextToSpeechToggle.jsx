@@ -1,6 +1,7 @@
 // client/src/components/kiosk/components/TextToSpeechToggle.jsx
 import React from 'react';
 import { useAccessibility } from '../../../context/AccessibilityContext.jsx';
+import TranslatedText from "../../common/TranslateText.jsx";
 
 const TextToSpeechToggle = () => {
   const { ttsEnabled, setTtsEnabled, ttsSupported } = useAccessibility();
@@ -26,7 +27,7 @@ const TextToSpeechToggle = () => {
       <span aria-hidden="true">
         {ttsEnabled ? '􀊦' : '􀊦'}
       </span>
-      <span>{label}</span>
+      <span><TranslatedText text={label} /></span>
     </button>
   );
 };

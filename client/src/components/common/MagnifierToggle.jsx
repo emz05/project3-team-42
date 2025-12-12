@@ -1,6 +1,7 @@
 // client/src/components/common/MagnifierToggle.jsx
 import React from 'react';
 import { useAccessibility } from '../../context/AccessibilityContext.jsx';
+import TranslatedText from "./TranslateText.jsx";
 
 const MagnifierToggle = () => {
   const { magnifierEnabled, setMagnifierEnabled } = useAccessibility();
@@ -21,7 +22,7 @@ const MagnifierToggle = () => {
       <span aria-hidden="true">
         {magnifierEnabled ? '􀊬' : '􀊬'}
       </span>
-      <span>Magnifier</span>
+      <span><TranslatedText text="Magnifier" /></span>
     </button>
   );
 };
