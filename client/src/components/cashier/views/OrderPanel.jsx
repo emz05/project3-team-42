@@ -465,7 +465,7 @@ const OrderPanel = () => {
         <div className="order-panel">
             <header className="order-header">
                 <div className="order-language-dropdown">
-                    <LanguageDropdown/>
+                    <LanguageDropdown align="left"/>
                     <MagnifierToggle />
                 </div>
                 <h1 className="header-title"> <TranslatedText text={'Cashier View'} /></h1>

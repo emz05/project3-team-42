@@ -13,21 +13,13 @@ const MagnifierToggle = () => {
     <button
       type="button"
       onClick={handleChange}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.4rem',
-        padding: '0.4rem 0.6rem',
-        borderRadius: '999px',
-        border: '1px solid #ccc',
-        backgroundColor: magnifierEnabled ? '#e5f5ff' : '#f5f5f5',
-        cursor: 'pointer',
-        fontSize: '0.9rem',
-      }}
+      className={`bg-white rounded-full px-6 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center gap-2 transition-shadow text-sm font-semibold text-gray-800
+        ${magnifierEnabled ? 'ring-2 ring-indigo-500/60' : ''}
+        hover:shadow-lg cursor-pointer`}
       aria-label={magnifierEnabled ? 'Disable magnifying glass' : 'Enable magnifying glass'}
     >
       <span aria-hidden="true">
-        {magnifierEnabled ? '🔍' : '🔎'}
+        {magnifierEnabled ? '􀊬' : '􀊬'}
       </span>
       <span>Magnifier</span>
     </button>
@@ -35,4 +27,3 @@ const MagnifierToggle = () => {
 };
 
 export default MagnifierToggle;
-

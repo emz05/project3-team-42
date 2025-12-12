@@ -66,8 +66,8 @@ export default function GuestOptionsPage() {
 
         <div className="profile-back">
           <SpeakOnHover text="Back">
-            <button className="kiosk-nav" onClick={handleBack}>
-              <TranslatedText text="Back" />
+            <button className="kiosk-nav-guest" onClick={handleBack}>
+              <TranslatedText text="Back to Options" />
             </button>
           </SpeakOnHover>
         </div>

@@ -140,7 +140,6 @@ export default function CustomizePage() {
   return (
     <div className="kiosk-page">
       <KioskHeader />
-
       <div className="customize-title">
         <div className="customize-title-label">
           <TranslatedText text={"Customize Your Drink"} />
@@ -151,6 +150,25 @@ export default function CustomizePage() {
       </div>
 
       <div className="kiosk-options">
+          {/* Size Section */}
+          <section>
+              <h3>
+                  <TranslatedText text={"Size"} />
+              </h3>
+              <div className="option-grid">
+                  {sizeOptions.map((option) => (
+                      <SpeakOnHover text={option} key={option}>
+                          <button
+                              className={`option-btn ${size === option ? "selected" : ""}`}
+                              onClick={() => setSize(option)}
+                          >
+                              <TranslatedText text={option} />
+                          </button>
+                      </SpeakOnHover>
+                  ))}
+              </div>
+          </section>
+
         {drink.category === "Milk Tea" && (
           <section>
             <h3>
@@ -172,25 +190,6 @@ export default function CustomizePage() {
             </div>
           </section>
         )}
-
-        {/* Size Section */}
-        <section>
-          <h3>
-            <TranslatedText text={"Size"} />
-          </h3>
-          <div className="option-grid">
-            {sizeOptions.map((option) => (
-              <SpeakOnHover text={option} key={option}>
-                <button
-                  className={`option-btn ${size === option ? "selected" : ""}`}
-                  onClick={() => setSize(option)}
-                >
-                  <TranslatedText text={option} />
-                </button>
-              </SpeakOnHover>
-            ))}
-          </div>
-        </section>
 
         {/* Ice Level Section */}
         {!(drink.category === "Milk Tea" && temperature === "Hot") && (
@@ -261,24 +260,26 @@ export default function CustomizePage() {
       </div>
 
       <div className="kiosk-buttons">
-        <SpeakOnHover text="Back to items">
-          <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
-            <TranslatedText text={"Back to Items"} />
-          </button>
-        </SpeakOnHover>
-
         <SpeakOnHover text="Add to cart">
-          <button className="kiosk-action-button" onClick={handleAddToCart}>
+          <button className="kiosk-review-button" onClick={handleAddToCart}>
             <TranslatedText text={"Add to Cart"} />
           </button>
         </SpeakOnHover>
 
         <SpeakOnHover text="Review order">
           <button
-            className="kiosk-action-button"
+            className="kiosk-review-button"
             onClick={() => navigate("/kiosk/review")}
           >
             <TranslatedText text={"Review Order"} />
+          </button>
+        </SpeakOnHover>
+      </div>
+
+      <div className="kiosk-buttons" style={{ marginTop: "16px" }}>
+        <SpeakOnHover text="Back to items">
+          <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
+            <TranslatedText text={"Back to Items"} />
           </button>
         </SpeakOnHover>
       </div>

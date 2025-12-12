@@ -949,18 +949,7 @@ const ManagerPanel = () => {
         </div>
         <div className="manager-home-button">
           <div className="home-weather-row">
-            <button
-              className="home-button"
-              onClick={() => navigate('/home')}
-              title="Home"
-            >
-              <img 
-                src={homeIcon} 
-                alt="Home" 
-                className="home-icon"
-              />
-            </button>
-            <div className="weather-container">
+            <div className="weather-container pill-style">
               {weatherLoading ? (
                 <div className="weather-loading">
                   <TranslatedText text="Loading weather..." />
@@ -992,7 +981,7 @@ const ManagerPanel = () => {
       <main className="content">
         <header className="manager-header">
           <div className="manager-language-dropdown-header">
-            <LanguageDropdown />
+            <LanguageDropdown align="left" />
             <MagnifierToggle />
           </div>
           <h1 className="manager-header-title">

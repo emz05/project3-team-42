@@ -1,50 +1,5 @@
 /* contrast-toggle.css - Contrast toggle button styles */
 
-.contrast-toggle {
-    position: fixed;
-    top: 20px;
-    left: 30px;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    background-color: #ffffff;
-    border: 2px solid #e5e7eb;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    font-family: "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.contrast-toggle:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    border-color: #d1d5db;
-}
-
-.contrast-toggle:active {
-    transform: translateY(0);
-}
-
-.contrast-toggle.active {
-    background-color: #1f2937;
-    color: #ffffff;
-    border-color: #1f2937;
-}
-
-.contrast-toggle svg {
-    flex-shrink: 0;
-}
-
-.contrast-toggle-text {
-    white-space: nowrap;
-}
-
 /* High contrast mode styles */
 body.high-contrast {
     background-color: #000000;
