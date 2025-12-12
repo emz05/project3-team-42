@@ -4,6 +4,7 @@ import TextToSpeechToggle from "./TextToSpeechToggle.jsx";
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
 import ContrastToggle from "../views/ContrastToggle.jsx";
 import MagnifierToggle from "../../common/MagnifierToggle.jsx";
+import TranslatedText from "../../common/TranslateText.jsx";
 
 import "../css/kiosk-header.css";
 
@@ -40,7 +41,7 @@ export default function KioskHeader() {
           onClick={handleLogout}
           className="bg-white rounded-full px-6 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center gap-2 transition-shadow text-sm font-semibold text-gray-800 hover:shadow-[0_8px_18px_rgba(0,0,0,0.16)]"
         >
-          Logout
+          <TranslatedText text="Logout" />
         </button>
       </div>
     </header>

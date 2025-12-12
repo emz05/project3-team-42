@@ -944,9 +944,6 @@ const ManagerPanel = () => {
             </button>
           ))}
         </nav>
-        <div className="manager-language-dropdown">
-          <LanguageDropdown />
-        </div>
         <div className="manager-home-button">
           <div className="home-weather-row">
             <div className="weather-container pill-style">

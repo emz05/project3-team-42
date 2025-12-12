@@ -10,6 +10,7 @@ body.high-contrast .kiosk-page {
     background-color: #000000;
 }
 
+
 body.high-contrast h1,
 body.high-contrast h2,
 body.high-contrast h3,
@@ -21,11 +22,20 @@ body.high-contrast div {
     color: #ffffff !important;
 }
 
-/* Ensure inline styles don't override */
+/* Ensure ibody.high-contrast .kiosk-header button,
+    31 -body.high-contrast .kiosk-header .kiosk-header-right * {
+    32 -    background-color: #fbbf24 !important;
+    33 -    color: #000000 !important;
+    34 -    border-color: #ffffff !important;nline styles don't override */
 body.high-contrast [style*="color"] {
     color: #ffffff !important;
 }
-
+body.high-contrast .kiosk-header button,
+body.high-contrast .kiosk-header .kiosk-header-right * {
+background-color: #fbbf24 !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
 body.high-contrast .kiosk-card {
     background-color: #1f2937;
     border: 3px solid #ffffff;
@@ -144,6 +154,48 @@ body.high-contrast .error-message {
     border-radius: 8px;
 }
 
+/* High contrast for login/phone number keypad */
+body.high-contrast .login-box {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+body.high-contrast .login-title,
+body.high-contrast .login-header,
+body.high-contrast .dots-container {
+    color: #ffffff;
+}
+
+body.high-contrast .dot {
+    border-color: #ffffff;
+}
+
+body.high-contrast .dot.filled {
+    background-color: #ffffff;
+}
+
+body.high-contrast .num-btn {
+    background-color: #1f2937;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .num-btn:hover {
+    background-color: #374151;
+}
+
+body.high-contrast .delete-btn {
+    background-color: #b91c1c;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .number-pad {
+    filter: none;
+}
+
 /* Ensure images remain visible */
 body.high-contrast .kiosk-drink-image,
 body.high-contrast .cart-card-image {
@@ -256,3 +308,6 @@ body.high-contrast .kiosk-action-button.success:hover {
         display: none;
     }
 }
+
+
+
