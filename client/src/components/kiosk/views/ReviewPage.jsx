@@ -362,7 +362,7 @@ export default function ReviewPage() {
 
               <SpeakOnHover text="Proceed to payment">
                 <button
-                  className="kiosk-action-button"
+                  className="kiosk-payment-button"
                   onClick={handleProceedToPayment}
                 >
                   <TranslatedText text={"Proceed to Payment"} />

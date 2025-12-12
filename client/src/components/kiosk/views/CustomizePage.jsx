@@ -260,24 +260,26 @@ export default function CustomizePage() {
       </div>
 
       <div className="kiosk-buttons">
-        <SpeakOnHover text="Back to items">
-          <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
-            <TranslatedText text={"Back to Items"} />
-          </button>
-        </SpeakOnHover>
-
         <SpeakOnHover text="Add to cart">
-          <button className="kiosk-action-button" onClick={handleAddToCart}>
+          <button className="kiosk-review-button" onClick={handleAddToCart}>
             <TranslatedText text={"Add to Cart"} />
           </button>
         </SpeakOnHover>
 
         <SpeakOnHover text="Review order">
           <button
-            className="kiosk-action-button"
+            className="kiosk-review-button"
             onClick={() => navigate("/kiosk/review")}
           >
             <TranslatedText text={"Review Order"} />
+          </button>
+        </SpeakOnHover>
+      </div>
+
+      <div className="kiosk-buttons" style={{ marginTop: "16px" }}>
+        <SpeakOnHover text="Back to items">
+          <button className="kiosk-nav-items" onClick={() => navigate(-1)}>
+            <TranslatedText text={"Back to Items"} />
           </button>
         </SpeakOnHover>
       </div>
