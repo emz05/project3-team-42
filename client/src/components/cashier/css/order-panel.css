@@ -20,6 +20,12 @@
     z-index: 10;
 }
 
+.order-language-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .header-title {
     font-size: 24px;
     font-weight: bold;

@@ -38,6 +38,7 @@ const ManagerProtectedRoute = ({ children }) => {
 import { ContrastProvider } from './components/kiosk/views/ContrastContext.jsx';
 import { CartProvider } from "./components/kiosk/views/CartContext.jsx";
 import { AccessibilityProvider } from './context/AccessibilityContext.jsx';
+import MagnifyingGlass from './components/common/MagnifyingGlass.jsx';
 
 function Client() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
@@ -48,6 +49,7 @@ function Client() {
 
   return (
     <AccessibilityProvider>
+      <MagnifyingGlass />
       <TranslationWrapper>
         <GoogleOAuthProvider clientId={googleClientId}>
           <ManagerAuthProvider>

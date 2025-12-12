@@ -166,7 +166,38 @@ const Receipt = {
 
     getXReport: async (connection = pool) => {
         const today = new Date().toISOString().slice(0, 10);
-        return buildDailyReport(today, connection);
+        const now = new Date();
+        const currentHour = now.getHours();
+        
+        // Get daily report data
+        const dailyReport = await buildDailyReport(today, connection);
+        
+        // Get hourly totals up to current hour
+        // Using EXTRACT(HOUR FROM transaction_time::time) to get hour as integer (0-23)
+        const hourlyQuery = `
+            SELECT EXTRACT(HOUR FROM transaction_time::time)::integer AS hour,
+                   COUNT(*) AS total_orders,
+                   COALESCE(SUM(amount), 0) AS total_sales
+            FROM receipt
+            WHERE transaction_date = $1::date
+              AND EXTRACT(HOUR FROM transaction_time::time)::integer <= $2
+            GROUP BY EXTRACT(HOUR FROM transaction_time::time)::integer
+            ORDER BY hour ASC
+        `;
+        
+        const hourlyRes = await connection.query(hourlyQuery, [today, currentHour]);
+        
+        // Format hourly data
+        const hourlyTotals = hourlyRes.rows.map(row => ({
+            hour: parseInt(row.hour) || 0,
+            total_orders: parseInt(row.total_orders) || 0,
+            total_sales: parseFloat(row.total_sales) || 0
+        }));
+        
+        return {
+            ...dailyReport,
+            hourly_totals: hourlyTotals
+        };
     },
 
     getZReport: async (connection = pool) => {

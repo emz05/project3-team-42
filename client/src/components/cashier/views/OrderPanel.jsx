@@ -9,6 +9,7 @@ import CustomizationPanel from "./CustomizationPanel.jsx";
 import PaymentConfirmation from "./PaymentConfirmation.jsx";
 import { useTranslation } from '../../../context/translation-storage.jsx';
 import LanguageDropdown from "../../common/LanguageDropdown.jsx";
+import MagnifierToggle from "../../common/MagnifierToggle.jsx";
 import TranslatedText from "../../common/TranslateText.jsx";
 import { drinkAPI, orderAPI, pendingOrderAPI, notificationAPI, customerAPI } from "../../../services/api.js";
 import '../css/order-panel.css'
@@ -463,7 +464,10 @@ const OrderPanel = () => {
     return (
         <div className="order-panel">
             <header className="order-header">
-                <div className="order-language-dropdown"> <LanguageDropdown/></div>
+                <div className="order-language-dropdown">
+                    <LanguageDropdown/>
+                    <MagnifierToggle />
+                </div>
                 <h1 className="header-title"> <TranslatedText text={'Cashier View'} /></h1>
                 <button className="logout-btn" onClick={handleLogout}>
                     <TranslatedText text={'Logout'} />
